@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Metas - Control Personal</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/metas.css') }}"
+    >
+</head>
+
+<body>
+
+    <!-- =========================================
+         SIDEBAR
+    ========================================== -->
+
+    <aside class="sidebar">
+
+        <div class="logo">
+            🎯 <span>Control Personal</span>
+        </div>
+
+        <nav>
+
+            <button
+                class="nav-item"
+                onclick="window.location.href='/'"
+            >
+                🏠 <span>Hoy</span>
+            </button>
+
+            <button
+                class="nav-item"
+                onclick="window.location.href='/horario'"
+            >
+                📅 <span>Horario</span>
+            </button>
+
+            <button
+                class="nav-item"
+                onclick="window.location.href='/habitos'"
+            >
+                ✅ <span>Hábitos</span>
+            </button>
+
+            <button
+                class="nav-item"
+                onclick="window.location.href='/progreso'"
+            >
+                📊 <span>Progreso</span>
+            </button>
+
+            <button
+                class="nav-item activo"
+                onclick="window.location.href='/metas'"
+            >
+                🎯 <span>Metas</span>
+            </button>
+
+            <button
+                class="nav-item"
+                onclick="window.location.href='/configuracion'"
+            >
+                ⚙️ <span>Configuración</span>
+            </button>
+
+        </nav>
+
+    </aside>
+
+
+    <!-- =========================================
+         CONTENIDO
+    ========================================== -->
+
+    <main class="contenido metas-contenido">
+
+        <header class="metas-header">
+
+            <div>
+                <p class="fecha">
+                    OBJETIVOS
+                </p>
+
+                <h1>Metas</h1>
+
+                <p class="metas-subtitulo">
+                    Convierte tus objetivos en progreso real
+                </p>
+            </div>
+
+            <button
+                class="btn-nueva-meta"
+                id="nuevaMeta"
+            >
+                ＋ Nueva meta
+            </button>
+
+        </header>
+
+
+        <!-- =====================================
+             RESUMEN
+        ====================================== -->
+
+        <section class="resumen-metas">
+
+            <div class="resumen-meta-item">
+                <span>🎯</span>
+
+                <div>
+                    <strong id="metasActivas">0</strong>
+                    <small>Metas activas</small>
+                </div>
+            </div>
+
+
+            <div class="resumen-meta-item">
+                <span>🏆</span>
+
+                <div>
+                    <strong id="metasCompletadas">0</strong>
+                    <small>Completadas</small>
+                </div>
+            </div>
+
+
+            <div class="resumen-meta-item">
+                <span>📋</span>
+
+                <div>
+                    <strong id="metasTotal">0</strong>
+                    <small>Total</small>
+                </div>
+            </div>
+
+        </section>
+
+
+        <!-- =====================================
+             FILTROS
+        ====================================== -->
+
+        <div class="filtros-metas">
+
+            <button
+                class="filtro-meta activo"
+                data-filtro="activas"
+            >
+                Activas
+            </button>
+
+            <button
+                class="filtro-meta"
+                data-filtro="completadas"
+            >
+                Completadas
+            </button>
+
+            <button
+                class="filtro-meta"
+                data-filtro="todas"
+            >
+                Todas
+            </button>
+
+        </div>
+
+
+        <!-- =====================================
+             LISTA
+        ====================================== -->
+
+        <section
+            class="lista-metas"
+            id="listaMetas"
+        >
+            <div class="metas-vacio">
+                Cargando metas...
+            </div>
+        </section>
+
+    </main>
+
+
+    <!-- =========================================
+         MODAL CREAR / EDITAR
+    ========================================== -->
+
+    <div
+        class="modal-meta-fondo"
+        id="modalMeta"
+    >
+
+        <div class="modal-meta">
+
+            <div class="modal-meta-header">
+
+                <h2 id="tituloModalMeta">
+                    Nueva meta
+                </h2>
+
+                <button
+                    class="cerrar-modal-meta"
+                    id="cerrarModalMeta"
+                >
+                    ✕
+                </button>
+
+            </div>
+
+
+            <div class="form-meta">
+
+                <label class="campo-meta">
+
+                    <span>Nombre</span>
+
+                    <input
+                        id="inputNombreMeta"
+                        type="text"
+                        placeholder="Ej. Terminar certificación"
+                        maxlength="100"
+                    >
+
+                </label>
+
+
+                <label class="campo-meta">
+
+                    <span>Descripción</span>
+
+                    <textarea
+                        id="inputDescripcionMeta"
+                        placeholder="¿Qué quieres conseguir?"
+                        maxlength="500"
+                    ></textarea>
+
+                </label>
+
+
+                <div class="fila-meta">
+
+                    <label class="campo-meta campo-icono-meta">
+
+                        <span>Icono</span>
+
+                        <input
+                            id="inputIconoMeta"
+                            type="text"
+                            value="🎯"
+                            maxlength="10"
+                        >
+
+                    </label>
+
+
+                    <label class="campo-meta">
+
+                        <span>Categoría</span>
+
+                        <input
+                            id="inputCategoriaMeta"
+                            type="text"
+                            placeholder="Ej. carrera"
+                            maxlength="50"
+                        >
+
+                    </label>
+
+                </div>
+
+
+                <label class="campo-meta">
+
+                    <span>Fecha límite</span>
+
+                    <input
+                        id="inputFechaMeta"
+                        type="date"
+                        onclick="this.showPicker && this.showPicker()"
+                    >
+
+                    <small>
+                        Puedes dejarla vacía si la meta no tiene fecha límite.
+                    </small>
+
+                </label>
+
+
+                <div
+                    class="mensaje-meta"
+                    id="mensajeMeta"
+                ></div>
+
+
+                <div class="acciones-modal-meta">
+
+                    <button
+                        class="btn-secundario-meta"
+                        id="cancelarModalMeta"
+                    >
+                        Cancelar
+                    </button>
+
+                    <button
+                        class="btn-guardar-meta"
+                        id="guardarMeta"
+                    >
+                        Guardar meta
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================================
+         MODAL ELIMINAR
+    ========================================== -->
+
+    <div
+        class="modal-meta-fondo"
+        id="modalEliminarMeta"
+    >
+
+        <div class="modal-meta modal-eliminar-meta">
+
+            <h2>Eliminar meta</h2>
+
+            <p>
+                ¿Quieres eliminar
+                <strong id="nombreEliminarMeta">
+                    esta meta
+                </strong>?
+            </p>
+
+            <p class="advertencia-meta">
+                Esta acción eliminará la meta
+                permanentemente.
+            </p>
+
+
+            <div class="acciones-modal-meta">
+
+                <button
+                    class="btn-secundario-meta"
+                    id="cancelarEliminarMeta"
+                >
+                    Cancelar
+                </button>
+
+                <button
+                    class="btn-eliminar-meta"
+                    id="confirmarEliminarMeta"
+                >
+                    Eliminar
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <script
+        src="{{ url_for('static', filename='js/metas.js') }}"
+    ></script>
+
+</body>
+</html>

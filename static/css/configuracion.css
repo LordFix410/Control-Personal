@@ -1,0 +1,425 @@
+/* =========================================
+   CONFIGURACIÓN
+========================================= */
+
+.configuracion-contenido {
+    overflow-y: auto;
+    padding-bottom: 60px;
+}
+
+
+/* =========================================
+   HEADER
+========================================= */
+
+.configuracion-header {
+    display: flex;
+
+    justify-content: space-between;
+    align-items: center;
+
+    margin-bottom: 22px;
+}
+
+.configuracion-header h1 {
+    font-size: 30px;
+
+    margin-bottom: 5px;
+}
+
+.configuracion-subtitulo {
+    color: #8d94a5;
+}
+
+.estado-guardado {
+    min-width: 120px;
+
+    text-align: right;
+
+    color: #69bd80;
+
+    font-size: 12px;
+
+    opacity: 0;
+
+    transition: opacity .25s ease;
+}
+
+.estado-guardado.visible {
+    opacity: 1;
+}
+
+
+/* =========================================
+   GRUPOS
+========================================= */
+
+.grupo-configuracion {
+    background: #171a21;
+
+    border: 1px solid #292d38;
+
+    border-radius: 12px;
+
+    margin-bottom: 13px;
+
+    overflow: hidden;
+}
+
+
+.grupo-configuracion-header {
+    display: flex;
+
+    align-items: center;
+
+    gap: 13px;
+
+    padding: 17px 18px;
+
+    border-bottom:
+        1px solid #252934;
+}
+
+
+.grupo-icono {
+    width: 42px;
+    height: 42px;
+
+    flex-shrink: 0;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    background: #222630;
+
+    border-radius: 9px;
+
+    font-size: 20px;
+}
+
+
+.grupo-configuracion-header h2 {
+    font-size: 16px;
+
+    margin-bottom: 3px;
+}
+
+
+.grupo-configuracion-header p {
+    color: #7f8696;
+
+    font-size: 11px;
+}
+
+
+/* =========================================
+   OPCIONES
+========================================= */
+
+.opciones-configuracion {
+    display: flex;
+
+    flex-direction: column;
+}
+
+
+.opcion-configuracion {
+    min-height: 70px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 20px;
+
+    padding: 14px 18px;
+
+    border-bottom:
+        1px solid #222630;
+}
+
+
+.opcion-configuracion:last-child {
+    border-bottom: none;
+}
+
+
+.opcion-configuracion strong {
+    display: block;
+
+    color: #d8dbe3;
+
+    font-size: 13px;
+
+    margin-bottom: 4px;
+}
+
+
+.opcion-configuracion p {
+    color: #7f8696;
+
+    font-size: 11px;
+
+    line-height: 1.45;
+}
+
+
+.opcion-principal {
+    background:
+        rgba(108, 140, 255, .035);
+}
+
+
+/* =========================================
+   SUBOPCIONES
+========================================= */
+
+.subopciones-configuracion {
+    padding-left: 35px;
+
+    transition:
+        opacity .2s ease;
+}
+
+
+.subopciones-configuracion.desactivadas {
+    opacity: .35;
+
+    pointer-events: none;
+}
+
+
+.subopciones-configuracion
+.opcion-configuracion {
+    border-left:
+        2px solid #303747;
+}
+
+
+/* =========================================
+   SWITCH
+========================================= */
+
+.switch-config {
+    position: relative;
+
+    width: 42px;
+    height: 23px;
+
+    flex-shrink: 0;
+
+    display: inline-block;
+}
+
+
+.switch-config input {
+    display: none;
+}
+
+
+.switch-config-slider {
+    position: absolute;
+
+    inset: 0;
+
+    background: #343946;
+
+    border-radius: 20px;
+
+    cursor: pointer;
+
+    transition: .2s;
+}
+
+
+.switch-config-slider::before {
+    content: "";
+
+    position: absolute;
+
+    width: 17px;
+    height: 17px;
+
+    left: 3px;
+    top: 3px;
+
+    background: #d9dce3;
+
+    border-radius: 50%;
+
+    transition: .2s;
+}
+
+
+.switch-config
+input:checked
++
+.switch-config-slider {
+    background: #6c8cff;
+}
+
+
+.switch-config
+input:checked
++
+.switch-config-slider::before {
+    transform:
+        translateX(19px);
+
+    background: white;
+}
+
+
+.switch-config
+input:disabled
++
+.switch-config-slider {
+    opacity: .35;
+
+    cursor: not-allowed;
+}
+
+
+/* =========================================
+   SELECT
+========================================= */
+
+.select-config {
+    min-width: 170px;
+
+    background: #11141a;
+
+    color: #d8dbe3;
+
+    border:
+        1px solid #343946;
+
+    border-radius: 8px;
+
+    padding: 9px 12px;
+
+    font-family: inherit;
+
+    outline: none;
+
+    cursor: pointer;
+}
+
+
+.select-config:focus {
+    border-color: #6c8cff;
+}
+
+
+/* =========================================
+   PRÓXIMAMENTE
+========================================= */
+
+.titulo-proximamente {
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+}
+
+
+.titulo-proximamente span {
+    padding: 3px 6px;
+
+    border-radius: 5px;
+
+    background: #2b3040;
+
+    color: #8994b6;
+
+    font-size: 8px;
+
+    font-weight: 800;
+
+    letter-spacing: .5px;
+}
+
+
+/* =========================================
+   DATOS
+========================================= */
+
+.informacion-datos {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, 1fr);
+
+    gap: 1px;
+
+    background: #292d38;
+}
+
+
+.informacion-datos > div {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 5px;
+
+    padding: 16px;
+
+    background: #171a21;
+}
+
+
+.informacion-datos span {
+    color: #777f90;
+
+    font-size: 10px;
+}
+
+
+.informacion-datos strong {
+    color: #c9cdd6;
+
+    font-size: 12px;
+
+    word-break: break-word;
+}
+
+
+.nota-datos {
+    padding: 13px 18px;
+
+    background:
+        rgba(75, 154, 99, .07);
+
+    color: #79a987;
+
+    font-size: 10px;
+
+    line-height: 1.5;
+}
+
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 700px) {
+
+    .informacion-datos {
+        grid-template-columns: 1fr;
+    }
+
+
+    .configuracion-header {
+        align-items: flex-start;
+    }
+
+
+    .subopciones-configuracion {
+        padding-left: 15px;
+    }
+}
