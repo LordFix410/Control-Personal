@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Progreso - Control Personal</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/progreso.css') }}"
+    >
+</head>
+
+<body>
+
+
+    <!-- =========================================
+         SIDEBAR
+    ========================================== -->
+
+    <aside class="sidebar">
+
+        <div class="logo">
+            🎯
+            <span>Control Personal</span>
+        </div>
+
+        <nav>
+
+            <button
+                class="nav-item"
+                onclick="window.location.href='/'"
+            >
+                🏠 <span>Hoy</span>
+            </button>
+
+            <button
+                class="nav-item"
+                onclick="window.location.href='/horario'"
+            >
+                📅 <span>Horario</span>
+            </button>
+
+            <button
+                class="nav-item"
+                onclick="window.location.href='/habitos'"
+            >
+                ✅ <span>Hábitos</span>
+            </button>
+
+            <button
+                class="nav-item activo"
+                onclick="window.location.href='/progreso'"
+            >
+                📊 <span>Progreso</span>
+            </button>
+
+            <button class="nav-item">
+                🎯 <span>Metas</span>
+            </button>
+
+            <button class="nav-item">
+                ⚙️ <span>Configuración</span>
+            </button>
+
+        </nav>
+
+    </aside>
+
+
+    <!-- =========================================
+         CONTENIDO
+    ========================================== -->
+
+    <main class="contenido progreso-contenido">
+
+
+        <!-- CABECERA -->
+
+        <header class="progreso-header">
+
+            <div>
+
+                <p class="fecha">
+                    ESTADÍSTICAS
+                </p>
+
+                <h1>
+                    Progreso
+                </h1>
+
+                <p class="progreso-subtitulo">
+                    Mira cómo estás utilizando tu tiempo
+                </p>
+
+            </div>
+
+            <div
+                class="fecha-progreso"
+                id="fechaProgreso"
+            >
+                Cargando...
+            </div>
+
+        </header>
+
+
+        <!-- =====================================
+             RESUMEN
+        ====================================== -->
+
+        <section class="tarjetas-resumen">
+
+
+            <article class="tarjeta-resumen">
+
+                <div class="resumen-icono">
+                    ⏱️
+                </div>
+
+                <div>
+
+                    <span>
+                        Tiempo registrado hoy
+                    </span>
+
+                    <strong id="tiempoHoy">
+                        0h 0m
+                    </strong>
+
+                </div>
+
+            </article>
+
+
+            <article class="tarjeta-resumen">
+
+                <div class="resumen-icono">
+                    ✓
+                </div>
+
+                <div>
+
+                    <span>
+                        Actividades completadas
+                    </span>
+
+                    <strong id="actividadesCompletadas">
+                        0
+                    </strong>
+
+                </div>
+
+            </article>
+
+
+            <article class="tarjeta-resumen">
+
+                <div class="resumen-icono">
+                    🔥
+                </div>
+
+                <div>
+
+                    <span>
+                        Hábitos de hoy
+                    </span>
+
+                    <strong id="habitosCompletados">
+                        0 / 0
+                    </strong>
+
+                </div>
+
+            </article>
+
+
+            <article class="tarjeta-resumen">
+
+                <div class="resumen-icono">
+                    📈
+                </div>
+
+                <div>
+
+                    <span>
+                        Cumplimiento hábitos
+                    </span>
+
+                    <strong id="porcentajeHabitos">
+                        0%
+                    </strong>
+
+                </div>
+
+            </article>
+
+
+        </section>
+
+
+        <!-- =====================================
+             SEMANA
+        ====================================== -->
+
+        <section class="panel-progreso">
+
+            <div class="panel-cabecera">
+
+                <div>
+
+                    <span class="etiqueta">
+                        ÚLTIMOS 7 DÍAS
+                    </span>
+
+                    <h2>
+                        Tiempo registrado
+                    </h2>
+
+                </div>
+
+
+                <strong
+                    class="total-semana"
+                    id="totalSemana"
+                >
+                    0h
+                </strong>
+
+            </div>
+
+
+            <div
+                class="grafica-semana"
+                id="graficaSemana"
+            >
+            </div>
+
+        </section>
+
+
+        <!-- =====================================
+             DOS COLUMNAS
+        ====================================== -->
+
+        <div class="progreso-columnas">
+
+
+            <!-- CATEGORÍAS -->
+
+            <section class="panel-progreso">
+
+                <div class="panel-cabecera">
+
+                    <div>
+
+                        <span class="etiqueta">
+                            DISTRIBUCIÓN
+                        </span>
+
+                        <h2>
+                            Tiempo por categoría
+                        </h2>
+
+                    </div>
+
+                </div>
+
+
+                <div
+                    class="lista-categorias"
+                    id="listaCategorias"
+                >
+
+                    <div class="progreso-cargando">
+                        Cargando...
+                    </div>
+
+                </div>
+
+            </section>
+
+
+
+            <!-- HÁBITOS -->
+
+            <section class="panel-progreso">
+
+                <div class="panel-cabecera">
+
+                    <div>
+
+                        <span class="etiqueta">
+                            CONSTANCIA
+                        </span>
+
+                        <h2>
+                            Hábitos de hoy
+                        </h2>
+
+                    </div>
+
+                </div>
+
+
+                <div class="habitos-resumen-progreso">
+
+                    <div class="circulo-habitos">
+
+                        <strong id="circuloPorcentaje">
+                            0%
+                        </strong>
+
+                        <span>
+                            completado
+                        </span>
+
+                    </div>
+
+
+                    <div class="detalle-habitos">
+
+                        <div>
+
+                            <span>
+                                Completados
+                            </span>
+
+                            <strong id="detalleHabitosCompletados">
+                                0
+                            </strong>
+
+                        </div>
+
+
+                        <div>
+
+                            <span>
+                                Pendientes
+                            </span>
+
+                            <strong id="detalleHabitosPendientes">
+                                0
+                            </strong>
+
+                        </div>
+
+
+                        <div>
+
+                            <span>
+                                Total
+                            </span>
+
+                            <strong id="detalleHabitosTotal">
+                                0
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+        </div>
+
+
+        <!-- =====================================
+             RENDIMIENTO ACTIVIDADES
+        ====================================== -->
+
+        <section class="panel-progreso rendimiento-panel">
+
+            <div class="panel-cabecera">
+
+                <div>
+
+                    <span class="etiqueta">
+                        RENDIMIENTO DE HOY
+                    </span>
+
+                    <h2>
+                        Tiempo real vs. objetivo
+                    </h2>
+
+                </div>
+
+            </div>
+
+
+            <div
+                class="lista-rendimiento"
+                id="listaRendimiento"
+            >
+
+                <div class="progreso-cargando">
+                    Cargando actividades...
+                </div>
+
+            </div>
+
+        </section>
+
+
+    </main>
+
+
+    <script
+        src="{{ url_for('static', filename='js/progreso.js') }}"
+    ></script>
+
+</body>
+
+</html>
