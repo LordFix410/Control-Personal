@@ -1,85 +1,204 @@
-from flask import Flask, render_template
-import sqlite3
-import os
+<!DOCTYPE html>
 
-app = Flask(__name__)
+<html lang="es">
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DB_PATH = os.path.join(BASE_DIR, "database", "control_personal.db")
+<head>
 
+    <meta charset="UTF-8">
 
-def crear_base_datos():
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-    os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
+    <title>Control Personal</title>
 
-    conexion = sqlite3.connect(DB_PATH)
-    cursor = conexion.cursor()
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
 
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS actividades (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            nombre TEXT NOT NULL,
-            categoria TEXT,
-            icono TEXT,
-            hora_inicio TEXT,
-            hora_fin TEXT,
-            dia_semana INTEGER,
-            activo INTEGER DEFAULT 1
-        )
-    """)
+</head>
 
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS sesiones (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            actividad_id INTEGER NOT NULL,
-            fecha TEXT NOT NULL,
-            hora_inicio TEXT,
-            hora_fin TEXT,
-            segundos_reales INTEGER DEFAULT 0,
-            estado TEXT DEFAULT 'pendiente',
+<body>
 
-            FOREIGN KEY (actividad_id)
-                REFERENCES actividades(id)
-        )
-    """)
+    <aside class="sidebar">
 
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS habitos (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            nombre TEXT NOT NULL,
-            icono TEXT,
-            objetivo INTEGER DEFAULT 1,
-            activo INTEGER DEFAULT 1
-        )
-    """)
+        <div class="logo">
+            🎯
+            <span>Control Personal</span>
+        </div>
 
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS progreso_habitos (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            habito_id INTEGER NOT NULL,
-            fecha TEXT NOT NULL,
-            cantidad INTEGER DEFAULT 0,
-            completado INTEGER DEFAULT 0,
+        <nav>
 
-            FOREIGN KEY (habito_id)
-                REFERENCES habitos(id)
-        )
-    """)
+            <button class="nav-item activo">
+                🏠 <span>Hoy</span>
+            </button>
 
-    conexion.commit()
-    conexion.close()
+            <button class="nav-item">
+                📅 <span>Horario</span>
+            </button>
+
+            <button class="nav-item">
+                ✅ <span>Hábitos</span>
+            </button>
+
+            <button class="nav-item">
+                📊 <span>Progreso</span>
+            </button>
+
+            <button class="nav-item">
+                🎯 <span>Metas</span>
+            </button>
+
+            <button class="nav-item">
+                ⚙️ <span>Configuración</span>
+            </button>
+
+        </nav>
+
+    </aside>
 
 
-@app.route("/")
-def inicio():
-    return render_template("index.html")
+    <main class="contenido">
+
+        <header>
+
+            <div>
+
+                <p class="fecha" id="fecha">
+                    Cargando...
+                </p>
+
+                <h1>
+                    Mi día
+                </h1>
+
+            </div>
+
+            <div class="racha">
+                🔥 <strong>0</strong> días
+            </div>
+
+        </header>
 
 
-if __name__ == "__main__":
-    crear_base_datos()
+        <section class="progreso">
 
-    app.run(
-        host="127.0.0.1",
-        port=5000,
-        debug=True
-    )
+            <div class="progreso-info">
+
+                <span>
+                    Progreso de hoy
+                </span>
+
+                <strong>
+                    0%
+                </strong>
+
+            </div>
+
+            <div class="barra">
+
+                <div
+                    class="barra-progreso"
+                    style="width: 0%"
+                ></div>
+
+            </div>
+
+        </section>
+
+
+        <section class="actividad">
+
+            <span class="etiqueta">
+                AHORA
+            </span>
+
+            <div class="actividad-principal">
+
+                <div
+                    class="actividad-icono"
+                    id="actividadIcono"
+                >
+                    ⏳
+                </div>
+
+                <div>
+
+                    <h2 id="actividadNombre">
+                        Cargando...
+                    </h2>
+
+                    <p id="actividadCategoria">
+                        --
+                    </p>
+
+                    <span id="actividadHorario">
+                        --:-- - --:--
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <div
+                class="temporizador"
+                id="temporizador"
+            >
+                00:00:00
+            </div>
+
+
+            <div class="acciones">
+
+                <button
+                    class="btn completar"
+                    id="completar"
+                >
+                    ✓ Completar
+                </button>
+
+                <button
+                    class="btn iniciar"
+                    id="iniciar"
+                >
+                    ▶ Iniciar
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <section class="siguiente">
+
+            <span class="etiqueta">
+                SIGUIENTE
+            </span>
+
+            <div class="siguiente-contenido">
+
+                <span id="siguienteNombre">
+                    Cargando...
+                </span>
+
+                <strong id="siguienteHora">
+                    --:--
+                </strong>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <script
+        src="{{ url_for('static', filename='js/app.js') }}"
+    ></script>
+
+</body>
+
+</html>
