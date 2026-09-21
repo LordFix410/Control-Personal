@@ -57,11 +57,17 @@
                 📊 <span>Progreso</span>
             </button>
 
-            <button class="nav-item">
+            <button
+                class="nav-item"
+                onclick="window.location.href='/metas'"
+            >
                 🎯 <span>Metas</span>
             </button>
 
-            <button class="nav-item">
+            <button
+                class="nav-item"
+                onclick="window.location.href='/configuracion'"
+            >
                 ⚙️ <span>Configuración</span>
             </button>
 
@@ -460,6 +466,12 @@
         src="{{ url_for('static', filename='js/app.js') }}"
     ></script>
 
+    <script
+        src="{{ url_for('static', filename='js/notificaciones.js') }}"
+    ></script>
+    <script
+        src="{{ url_for('static', filename='js/detecciones.js') }}"
+    ></script>
 </body>
 
 </html>

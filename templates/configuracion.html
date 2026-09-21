@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Configuración - Control Personal
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/configuracion.css') }}"
+    >
+
+</head>
+
+<body>
+
+
+    <!-- =====================================
+         SIDEBAR
+    ====================================== -->
+
+    <aside class="sidebar">
+
+        <div class="logo">
+            🎯
+            <span>Control Personal</span>
+        </div>
+
+        <nav>
+
+            <button
+                class="nav-item"
+                onclick="window.location.href='/'"
+            >
+                🏠 <span>Hoy</span>
+            </button>
+
+
+            <button
+                class="nav-item"
+                onclick="window.location.href='/horario'"
+            >
+                📅 <span>Horario</span>
+            </button>
+
+
+            <button
+                class="nav-item"
+                onclick="window.location.href='/habitos'"
+            >
+                ✅ <span>Hábitos</span>
+            </button>
+
+
+            <button
+                class="nav-item"
+                onclick="window.location.href='/progreso'"
+            >
+                📊 <span>Progreso</span>
+            </button>
+
+
+            <button
+                class="nav-item"
+                onclick="window.location.href='/metas'"
+            >
+                🎯 <span>Metas</span>
+            </button>
+
+
+            <button
+                class="nav-item activo"
+                onclick="window.location.href='/configuracion'"
+            >
+                ⚙️ <span>Configuración</span>
+            </button>
+
+        </nav>
+
+    </aside>
+
+
+    <!-- =====================================
+         CONTENIDO
+    ====================================== -->
+
+    <main class="contenido configuracion-contenido">
+
+
+        <!-- HEADER -->
+
+        <header class="configuracion-header">
+
+            <div>
+
+                <p class="fecha">
+                    PREFERENCIAS
+                </p>
+
+                <h1>
+                    Configuración
+                </h1>
+
+                <p class="configuracion-subtitulo">
+                    Personaliza el comportamiento
+                    de Control Personal
+                </p>
+
+            </div>
+
+
+            <div
+                class="estado-guardado"
+                id="estadoGuardado"
+            >
+            </div>
+
+        </header>
+
+
+
+        <!-- =================================
+             TEMPORIZADOR
+        ================================== -->
+
+        <section class="grupo-configuracion">
+
+            <div class="grupo-configuracion-header">
+
+                <div class="grupo-icono">
+                    ⏱️
+                </div>
+
+                <div>
+                    <h2>Temporizador</h2>
+
+                    <p>
+                        Comportamiento al registrar
+                        tus actividades.
+                    </p>
+                </div>
+
+            </div>
+
+
+            <div class="opciones-configuracion">
+
+
+                <div class="opcion-configuracion">
+
+                    <div>
+
+                        <strong>
+                            Confirmar cambio de actividad
+                        </strong>
+
+                        <p>
+                            Preguntar antes de pausar
+                            la actividad actual e iniciar otra.
+                        </p>
+
+                    </div>
+
+
+                    <label class="switch-config">
+
+                        <input
+                            type="checkbox"
+                            id="confirmarCambio"
+                        >
+
+                        <span
+                            class="switch-config-slider"
+                        ></span>
+
+                    </label>
+
+                </div>
+
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =================================
+             NOTIFICACIONES
+        ================================== -->
+
+        <section class="grupo-configuracion">
+
+            <div class="grupo-configuracion-header">
+
+                <div class="grupo-icono">
+                    🔔
+                </div>
+
+                <div>
+
+                    <h2>
+                        Notificaciones
+                    </h2>
+
+                    <p>
+                        Avisos relacionados con
+                        tu horario diario.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="opciones-configuracion">
+
+
+                <div class="opcion-configuracion">
+
+                    <div>
+
+                        <strong>
+                            Inicio de actividad
+                        </strong>
+
+                        <p>
+                            Avisar cuando llegue la hora
+                            programada de una actividad.
+                        </p>
+
+                    </div>
+
+
+                    <label class="switch-config">
+
+                        <input
+                            type="checkbox"
+                            id="notificarInicio"
+                        >
+
+                        <span
+                            class="switch-config-slider"
+                        ></span>
+
+                    </label>
+
+                </div>
+
+
+
+                <div class="opcion-configuracion">
+
+                    <div>
+
+                        <strong>
+                            Fin del tiempo programado
+                        </strong>
+
+                        <p>
+                            Avisar cuando termine el tiempo
+                            previsto de la actividad.
+                        </p>
+
+                    </div>
+
+
+                    <label class="switch-config">
+
+                        <input
+                            type="checkbox"
+                            id="notificarFin"
+                        >
+
+                        <span
+                            class="switch-config-slider"
+                        ></span>
+
+                    </label>
+
+                </div>
+
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =================================
+             AUTOMATIZACIÓN
+        ================================== -->
+
+        <section class="grupo-configuracion">
+
+            <div class="grupo-configuracion-header">
+
+                <div class="grupo-icono">
+                    🤖
+                </div>
+
+                <div>
+
+                    <h2>
+                        Automatización
+                    </h2>
+
+                    <p>
+                        Detectar actividades que realizas
+                        en la computadora.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="opciones-configuracion">
+
+
+                <div
+                    class="
+                        opcion-configuracion
+                        opcion-principal
+                    "
+                >
+
+                    <div>
+
+                        <strong>
+                            Detección automática
+                        </strong>
+
+                        <p>
+                            Permitir que Control Personal
+                            detecte aplicaciones y sitios
+                            compatibles.
+                        </p>
+
+                    </div>
+
+
+                    <label class="switch-config">
+
+                        <input
+                            type="checkbox"
+                            id="deteccionAutomatica"
+                        >
+
+                        <span
+                            class="switch-config-slider"
+                        ></span>
+
+                    </label>
+
+                </div>
+
+
+
+                <div
+                    class="subopciones-configuracion"
+                    id="subopcionesDeteccion"
+                >
+
+
+                    <div class="opcion-configuracion">
+
+                        <div>
+
+                            <strong>
+                                🇬🇧 Duolingo
+                            </strong>
+
+                            <p>
+                                Detectar cuando estés
+                                practicando inglés.
+                            </p>
+
+                        </div>
+
+
+                        <label class="switch-config">
+
+                            <input
+                                type="checkbox"
+                                id="detectarDuolingo"
+                            >
+
+                            <span
+                                class="switch-config-slider"
+                            ></span>
+
+                        </label>
+
+                    </div>
+
+
+
+                    <div class="opcion-configuracion">
+
+                        <div>
+
+                            <strong>
+                                🎓 Kodree
+                            </strong>
+
+                            <p>
+                                Detectar sesiones de
+                                certificación o estudio.
+                            </p>
+
+                        </div>
+
+
+                        <label class="switch-config">
+
+                            <input
+                                type="checkbox"
+                                id="detectarKodree"
+                            >
+
+                            <span
+                                class="switch-config-slider"
+                            ></span>
+
+                        </label>
+
+                    </div>
+
+
+                </div>
+
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =================================
+             APARIENCIA
+        ================================== -->
+
+        <section class="grupo-configuracion">
+
+            <div class="grupo-configuracion-header">
+
+                <div class="grupo-icono">
+                    🎨
+                </div>
+
+                <div>
+
+                    <h2>
+                        Apariencia
+                    </h2>
+
+                    <p>
+                        Personalización visual
+                        de la aplicación.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="opciones-configuracion">
+
+                <div class="opcion-configuracion">
+
+                    <div>
+
+                        <strong>
+                            Tema
+                        </strong>
+
+                        <p>
+                            Apariencia general
+                            de Control Personal.
+                        </p>
+
+                    </div>
+
+
+                    <select
+                        class="select-config"
+                        id="temaAplicacion"
+                    >
+
+                        <option value="oscuro">
+                            Oscuro
+                        </option>
+
+                        <option
+                            value="claro"
+                            disabled
+                        >
+                            Claro — próximamente
+                        </option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =================================
+             FUNCIONES INTELIGENTES
+        ================================== -->
+
+        <section class="grupo-configuracion">
+
+            <div class="grupo-configuracion-header">
+
+                <div class="grupo-icono">
+                    📷
+                </div>
+
+                <div>
+
+                    <h2>
+                        Funciones inteligentes
+                    </h2>
+
+                    <p>
+                        Herramientas locales que podremos
+                        activar posteriormente.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="opciones-configuracion">
+
+
+                <div class="opcion-configuracion">
+
+                    <div>
+
+                        <div class="titulo-proximamente">
+
+                            <strong>
+                                Cámara para ejercicio
+                            </strong>
+
+                            <span>
+                                PRÓXIMAMENTE
+                            </span>
+
+                        </div>
+
+                        <p>
+                            Utilizar la cámara para contar
+                            repeticiones de ejercicio.
+                        </p>
+
+                    </div>
+
+
+                    <label class="switch-config">
+
+                        <input
+                            type="checkbox"
+                            id="camaraHabilitada"
+                            disabled
+                        >
+
+                        <span
+                            class="switch-config-slider"
+                        ></span>
+
+                    </label>
+
+                </div>
+
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =================================
+             DATOS
+        ================================== -->
+
+        <section class="grupo-configuracion">
+
+            <div class="grupo-configuracion-header">
+
+                <div class="grupo-icono">
+                    💾
+                </div>
+
+                <div>
+
+                    <h2>
+                        Datos
+                    </h2>
+
+                    <p>
+                        Información sobre el almacenamiento
+                        de Control Personal.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="informacion-datos">
+
+                <div>
+
+                    <span>
+                        Base de datos
+                    </span>
+
+                    <strong>
+                        SQLite
+                    </strong>
+
+                </div>
+
+
+                <div>
+
+                    <span>
+                        Archivo
+                    </span>
+
+                    <strong>
+                        control_personal.db
+                    </strong>
+
+                </div>
+
+
+                <div>
+
+                    <span>
+                        Almacenamiento
+                    </span>
+
+                    <strong>
+                        Local
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <div class="nota-datos">
+
+                🔒 Tus estadísticas, hábitos,
+                metas y sesiones se almacenan
+                localmente en tu computadora.
+
+            </div>
+
+        </section>
+
+
+    </main>
+
+
+    <script
+        src="{{ url_for('static', filename='js/configuracion.js') }}"
+    ></script>
+
+</body>
+
+</html>
