@@ -6,7 +6,7 @@ from flask import (
 )
 import sqlite3
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 
 app = Flask(__name__)
 
@@ -1331,6 +1331,391 @@ def iniciar_sesion(actividad_id):
     return jsonify({
         "ok": True
     })
+@app.route("/progreso")
+def progreso():
+    return render_template("progreso.html")
+
+@app.route("/api/progreso")
+def obtener_progreso():
+
+    ahora = datetime.now()
+    hoy = ahora.date()
+
+    inicio_semana = (
+        hoy - timedelta(days=6)
+    )
+
+    conexion = conectar()
+
+
+    # ==========================================
+    # RESUMEN DE HOY
+    # ==========================================
+
+    fecha_hoy = hoy.strftime("%Y-%m-%d")
+
+
+    sesiones_hoy = conexion.execute("""
+        SELECT
+            s.*,
+            a.nombre,
+            a.categoria,
+            a.icono,
+            a.hora_inicio AS programada_inicio,
+            a.hora_fin AS programada_fin
+
+        FROM sesiones s
+
+        INNER JOIN actividades a
+            ON a.id = s.actividad_id
+
+        WHERE s.fecha = ?
+    """, (
+        fecha_hoy,
+    )).fetchall()
+
+
+    segundos_hoy = 0
+    completadas_hoy = 0
+
+
+    for sesion in sesiones_hoy:
+
+        segundos = sesion["segundos_reales"] or 0
+
+
+        # Si justo ahora hay una actividad
+        # corriendo, incluimos ese bloque.
+
+        if (
+            sesion["estado_timer"] == "corriendo"
+            and sesion["ultimo_inicio"]
+        ):
+
+            inicio = datetime.fromisoformat(
+                sesion["ultimo_inicio"]
+            )
+
+            segundos += max(
+                0,
+                int(
+                    (
+                        ahora - inicio
+                    ).total_seconds()
+                )
+            )
+
+
+        segundos_hoy += segundos
+
+
+        if sesion["estado"] == "completado":
+            completadas_hoy += 1
+
+
+    # ==========================================
+    # HÁBITOS DE HOY
+    # ==========================================
+
+    habitos_activos = conexion.execute("""
+        SELECT COUNT(*) AS cantidad
+        FROM habitos
+        WHERE activo = 1
+    """).fetchone()["cantidad"]
+
+
+    habitos_completados = conexion.execute("""
+        SELECT COUNT(*) AS cantidad
+
+        FROM progreso_habitos p
+
+        INNER JOIN habitos h
+            ON h.id = p.habito_id
+
+        WHERE p.fecha = ?
+        AND p.completado = 1
+        AND h.activo = 1
+    """, (
+        fecha_hoy,
+    )).fetchone()["cantidad"]
+
+
+    porcentaje_habitos = (
+        round(
+            habitos_completados
+            /
+            habitos_activos
+            *
+            100
+        )
+        if habitos_activos > 0
+        else 0
+    )
+
+
+    # ==========================================
+    # ÚLTIMOS 7 DÍAS
+    # ==========================================
+
+    dias = []
+
+
+    nombres_cortos = [
+        "Lun",
+        "Mar",
+        "Mié",
+        "Jue",
+        "Vie",
+        "Sáb",
+        "Dom"
+    ]
+
+
+    for indice in range(7):
+
+        fecha = inicio_semana + timedelta(
+            days=indice
+        )
+
+
+        fecha_texto = fecha.strftime("%Y-%m-%d")
+
+
+        sesiones_dia = conexion.execute("""
+            SELECT
+                segundos_reales,
+                estado_timer,
+                ultimo_inicio
+
+            FROM sesiones
+
+            WHERE fecha = ?
+        """, (
+            fecha_texto,
+        )).fetchall()
+
+
+        segundos_dia = 0
+
+
+        for sesion in sesiones_dia:
+
+            segundos = sesion["segundos_reales"] or 0
+
+
+            if (
+                fecha == hoy
+                and
+                sesion["estado_timer"] == "corriendo"
+                and
+                sesion["ultimo_inicio"]
+            ):
+
+                inicio = datetime.fromisoformat(
+                    sesion["ultimo_inicio"]
+                )
+
+                segundos += max(
+                    0,
+                    int(
+                        (
+                            ahora - inicio
+                        ).total_seconds()
+                    )
+                )
+
+
+            segundos_dia += segundos
+
+
+        dias.append({
+            "fecha": fecha_texto,
+
+            "dia":
+                nombres_cortos[
+                    fecha.weekday()
+                ],
+
+            "segundos":
+                segundos_dia
+        })
+
+
+    # ==========================================
+    # TIEMPO POR CATEGORÍA - 7 DÍAS
+    # ==========================================
+
+    categorias = conexion.execute("""
+        SELECT
+            COALESCE(
+                a.categoria,
+                'Sin categoría'
+            ) AS categoria,
+
+            SUM(
+                s.segundos_reales
+            ) AS segundos
+
+        FROM sesiones s
+
+        INNER JOIN actividades a
+            ON a.id = s.actividad_id
+
+        WHERE s.fecha >= ?
+        AND s.fecha <= ?
+
+        GROUP BY a.categoria
+
+        ORDER BY segundos DESC
+    """, (
+        inicio_semana.strftime(
+            "%Y-%m-%d"
+        ),
+        fecha_hoy
+    )).fetchall()
+
+
+    categorias_resultado = [
+        {
+            "categoria":
+                fila["categoria"]
+                or "Sin categoría",
+
+            "segundos":
+                fila["segundos"]
+                or 0
+        }
+
+        for fila in categorias
+    ]
+
+
+    # ==========================================
+    # ACTIVIDADES DE HOY
+    # ==========================================
+
+    actividades_hoy = []
+
+
+    for sesion in sesiones_hoy:
+
+        segundos = sesion["segundos_reales"] or 0
+
+
+        if (
+            sesion["estado_timer"] == "corriendo"
+            and
+            sesion["ultimo_inicio"]
+        ):
+
+            inicio = datetime.fromisoformat(
+                sesion["ultimo_inicio"]
+            )
+
+            segundos += max(
+                0,
+                int(
+                    (
+                        ahora - inicio
+                    ).total_seconds()
+                )
+            )
+
+
+        inicio_programado = datetime.strptime(
+            sesion["programada_inicio"],
+            "%H:%M"
+        )
+
+
+        fin_programado = datetime.strptime(
+            sesion["programada_fin"],
+            "%H:%M"
+        )
+
+
+        objetivo = int(
+            (
+                fin_programado
+                -
+                inicio_programado
+            ).total_seconds()
+        )
+
+
+        porcentaje = (
+            round(
+                segundos
+                /
+                objetivo
+                *
+                100
+            )
+            if objetivo > 0
+            else 0
+        )
+
+
+        actividades_hoy.append({
+            "id":
+                sesion["actividad_id"],
+
+            "nombre":
+                sesion["nombre"],
+
+            "icono":
+                sesion["icono"],
+
+            "categoria":
+                sesion["categoria"],
+
+            "segundos":
+                segundos,
+
+            "objetivo":
+                objetivo,
+
+            "porcentaje":
+                porcentaje,
+
+            "estado":
+                sesion["estado"]
+        })
+
+
+    conexion.close()
+
+
+    return jsonify({
+
+        "resumen": {
+
+            "segundos_hoy":
+                segundos_hoy,
+
+            "actividades_completadas":
+                completadas_hoy,
+
+            "habitos_completados":
+                habitos_completados,
+
+            "habitos_total":
+                habitos_activos,
+
+            "porcentaje_habitos":
+                porcentaje_habitos
+        },
+
+        "dias":
+            dias,
+
+        "categorias":
+            categorias_resultado,
+
+        "actividades":
+            actividades_hoy
+    })
+
 @app.route("/habitos")
 def habitos():
     return render_template("habitos.html")

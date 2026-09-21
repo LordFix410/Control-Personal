@@ -1,0 +1,631 @@
+/* =========================================
+   PROGRESO
+========================================= */
+
+.progreso-contenido {
+    overflow-y: auto;
+    padding-bottom: 50px;
+}
+
+
+/* =========================================
+   CABECERA
+========================================= */
+
+.progreso-header {
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    margin-bottom: 24px;
+}
+
+.progreso-header h1 {
+    font-size: 30px;
+    margin-bottom: 5px;
+}
+
+.progreso-subtitulo {
+    color: #8d94a5;
+}
+
+.fecha-progreso {
+    color: #8d94a5;
+
+    font-size: 13px;
+
+    text-align: right;
+}
+
+
+/* =========================================
+   TARJETAS RESUMEN
+========================================= */
+
+.tarjetas-resumen {
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, minmax(150px, 1fr));
+
+    gap: 10px;
+
+    margin-bottom: 18px;
+}
+
+
+.tarjeta-resumen {
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    background: #171a21;
+
+    border: 1px solid #292d38;
+
+    border-radius: 12px;
+
+    padding: 16px;
+}
+
+
+.resumen-icono {
+    width: 42px;
+    height: 42px;
+
+    flex-shrink: 0;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    background: #222630;
+
+    border-radius: 9px;
+
+    font-size: 20px;
+}
+
+
+.tarjeta-resumen > div:last-child {
+    min-width: 0;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 3px;
+}
+
+
+.tarjeta-resumen span {
+    color: #858c9c;
+
+    font-size: 11px;
+}
+
+
+.tarjeta-resumen strong {
+    font-size: 20px;
+
+    color: #f1f2f5;
+}
+
+
+/* =========================================
+   PANELES
+========================================= */
+
+.panel-progreso {
+    background: #171a21;
+
+    border: 1px solid #292d38;
+
+    border-radius: 12px;
+
+    padding: 18px;
+
+    margin-bottom: 14px;
+}
+
+
+.panel-cabecera {
+    display: flex;
+
+    justify-content: space-between;
+    align-items: center;
+
+    margin-bottom: 20px;
+}
+
+
+.panel-cabecera h2 {
+    font-size: 18px;
+
+    margin-top: 3px;
+}
+
+
+.total-semana {
+    color: #8fa8ff;
+
+    font-size: 20px;
+}
+
+
+/* =========================================
+   GRÁFICA SEMANAL
+========================================= */
+
+.grafica-semana {
+    height: 210px;
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(7, 1fr);
+
+    align-items: end;
+
+    gap: 14px;
+
+    padding-top: 10px;
+}
+
+
+.dia-grafica {
+    height: 100%;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: flex-end;
+
+    gap: 7px;
+}
+
+
+.valor-grafica {
+    color: #8d94a5;
+
+    font-size: 10px;
+
+    min-height: 14px;
+}
+
+
+.contenedor-barra-dia {
+    width: 100%;
+    height: 145px;
+
+    display: flex;
+
+    align-items: flex-end;
+    justify-content: center;
+
+    background:
+        repeating-linear-gradient(
+            to top,
+            transparent,
+            transparent 35px,
+            rgba(255,255,255,.035) 36px
+        );
+
+    border-bottom:
+        1px solid #343946;
+}
+
+
+.barra-dia {
+    width: min(42px, 65%);
+
+    min-height: 3px;
+
+    background: #6c8cff;
+
+    border-radius: 6px 6px 2px 2px;
+
+    transition: height .35s ease;
+}
+
+
+.nombre-dia {
+    color: #8d94a5;
+
+    font-size: 11px;
+
+    font-weight: 700;
+}
+
+
+.dia-grafica.hoy .nombre-dia {
+    color: #8fa8ff;
+}
+
+
+.dia-grafica.hoy .barra-dia {
+    box-shadow:
+        0 0 15px
+        rgba(108, 140, 255, .25);
+}
+
+
+/* =========================================
+   COLUMNAS
+========================================= */
+
+.progreso-columnas {
+    display: grid;
+
+    grid-template-columns:
+        1.4fr 1fr;
+
+    gap: 14px;
+}
+
+
+/* =========================================
+   CATEGORÍAS
+========================================= */
+
+.lista-categorias {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 15px;
+}
+
+
+.categoria-item {
+    display: grid;
+
+    grid-template-columns:
+        minmax(100px, 160px)
+        1fr
+        70px;
+
+    align-items: center;
+
+    gap: 12px;
+}
+
+
+.categoria-nombre {
+    color: #d7dae2;
+
+    font-size: 13px;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    text-transform: capitalize;
+}
+
+
+.categoria-barra {
+    height: 7px;
+
+    background: #292d37;
+
+    border-radius: 20px;
+
+    overflow: hidden;
+}
+
+
+.categoria-barra-progreso {
+    height: 100%;
+
+    background: #6c8cff;
+
+    border-radius: inherit;
+}
+
+
+.categoria-tiempo {
+    color: #969dad;
+
+    font-size: 11px;
+
+    text-align: right;
+}
+
+
+/* =========================================
+   HÁBITOS RESUMEN
+========================================= */
+
+.habitos-resumen-progreso {
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 35px;
+
+    min-height: 150px;
+}
+
+
+.circulo-habitos {
+    width: 115px;
+    height: 115px;
+
+    flex-shrink: 0;
+
+    border-radius: 50%;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: center;
+
+    border:
+        9px solid #303645;
+
+    position: relative;
+}
+
+
+.circulo-habitos strong {
+    font-size: 24px;
+
+    color: #8fa8ff;
+}
+
+
+.circulo-habitos span {
+    color: #777f90;
+
+    font-size: 9px;
+}
+
+
+.detalle-habitos {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 11px;
+
+    min-width: 120px;
+}
+
+
+.detalle-habitos > div {
+    display: flex;
+
+    justify-content: space-between;
+
+    gap: 20px;
+}
+
+
+.detalle-habitos span {
+    color: #858c9c;
+
+    font-size: 11px;
+}
+
+
+.detalle-habitos strong {
+    color: #d9dce4;
+
+    font-size: 13px;
+}
+
+
+/* =========================================
+   RENDIMIENTO
+========================================= */
+
+.rendimiento-panel {
+    margin-top: 0;
+}
+
+
+.lista-rendimiento {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 8px;
+}
+
+
+.rendimiento-item {
+    display: grid;
+
+    grid-template-columns:
+        44px
+        minmax(150px, 1fr)
+        minmax(160px, 1.4fr)
+        70px;
+
+    align-items: center;
+
+    gap: 12px;
+
+    padding: 11px;
+
+    background: #13161c;
+
+    border: 1px solid #242832;
+
+    border-radius: 9px;
+}
+
+
+.rendimiento-icono {
+    width: 38px;
+    height: 38px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    background: #222630;
+
+    border-radius: 8px;
+
+    font-size: 19px;
+}
+
+
+.rendimiento-nombre {
+    font-weight: 700;
+
+    font-size: 13px;
+
+    margin-bottom: 3px;
+}
+
+
+.rendimiento-categoria {
+    color: #777f90;
+
+    font-size: 10px;
+
+    text-transform: capitalize;
+}
+
+
+.rendimiento-datos {
+    min-width: 0;
+}
+
+
+.rendimiento-tiempos {
+    display: flex;
+
+    justify-content: space-between;
+
+    color: #969dad;
+
+    font-size: 10px;
+
+    margin-bottom: 6px;
+}
+
+
+.rendimiento-barra {
+    height: 6px;
+
+    background: #292d37;
+
+    border-radius: 20px;
+
+    overflow: hidden;
+}
+
+
+.rendimiento-barra-progreso {
+    height: 100%;
+
+    background: #6c8cff;
+
+    border-radius: inherit;
+}
+
+
+.rendimiento-porcentaje {
+    text-align: right;
+
+    font-size: 13px;
+
+    font-weight: 800;
+
+    color: #9eafff;
+}
+
+
+.rendimiento-item.superado
+.rendimiento-porcentaje {
+    color: #65b97d;
+}
+
+
+.rendimiento-item.superado
+.rendimiento-barra-progreso {
+    background: #4fa46a;
+}
+
+
+/* =========================================
+   VACÍO / CARGANDO
+========================================= */
+
+.progreso-cargando,
+.progreso-vacio {
+    color: #747b8d;
+
+    text-align: center;
+
+    padding: 25px;
+
+    font-size: 12px;
+}
+
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 1050px) {
+
+    .tarjetas-resumen {
+        grid-template-columns:
+            repeat(2, 1fr);
+    }
+
+
+    .progreso-columnas {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+@media (max-width: 700px) {
+
+    .tarjetas-resumen {
+        grid-template-columns: 1fr;
+    }
+
+
+    .grafica-semana {
+        gap: 5px;
+    }
+
+
+    .rendimiento-item {
+        grid-template-columns:
+            40px
+            1fr
+            60px;
+    }
+
+
+    .rendimiento-datos {
+        grid-column:
+            2 / 4;
+
+        width: 100%;
+    }
+
+
+    .habitos-resumen-progreso {
+        flex-direction: column;
+
+        gap: 20px;
+    }
+}
