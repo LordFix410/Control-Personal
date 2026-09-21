@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Hábitos - Control Personal</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/habitos.css') }}"
+    >
+</head>
+
+
+<body>
+
+    <!-- =========================================
+         SIDEBAR
+    ========================================== -->
+
+    <aside class="sidebar">
+
+        <div class="logo">
+            🎯
+            <span>Control Personal</span>
+        </div>
+
+        <nav>
+
+            <button
+                class="nav-item"
+                onclick="window.location.href='/'"
+            >
+                🏠 <span>Hoy</span>
+            </button>
+
+            <button
+                class="nav-item"
+                onclick="window.location.href='/horario'"
+            >
+                📅 <span>Horario</span>
+            </button>
+
+            <button
+                class="nav-item activo"
+                onclick="window.location.href='/habitos'"
+            >
+                ✅ <span>Hábitos</span>
+            </button>
+
+            <button class="nav-item">
+                📊 <span>Progreso</span>
+            </button>
+
+            <button class="nav-item">
+                🎯 <span>Metas</span>
+            </button>
+
+            <button class="nav-item">
+                ⚙️ <span>Configuración</span>
+            </button>
+
+        </nav>
+
+    </aside>
+
+
+    <!-- =========================================
+         CONTENIDO
+    ========================================== -->
+
+    <main class="contenido habitos-contenido">
+
+
+        <!-- CABECERA -->
+
+        <header class="habitos-header">
+
+            <div>
+
+                <p class="fecha">
+                    CONSTANCIA DIARIA
+                </p>
+
+                <h1>
+                    Hábitos
+                </h1>
+
+                <p class="habitos-subtitulo">
+                    Construye constancia día a día
+                </p>
+
+            </div>
+
+
+            <button
+                class="btn-nuevo-habito"
+                id="nuevoHabito"
+            >
+                ＋ Nuevo hábito
+            </button>
+
+        </header>
+
+
+        <!-- =====================================
+             RESUMEN
+        ====================================== -->
+
+        <section class="resumen-habitos">
+
+            <div class="resumen-habitos-superior">
+
+                <div>
+
+                    <span class="resumen-titulo">
+                        Progreso de hoy
+                    </span>
+
+                    <strong id="textoResumen">
+                        0 de 0 hábitos completados
+                    </strong>
+
+                </div>
+
+
+                <strong
+                    class="porcentaje-habitos"
+                    id="porcentajeHabitos"
+                >
+                    0%
+                </strong>
+
+            </div>
+
+
+            <div class="barra-habitos">
+
+                <div
+                    class="barra-habitos-progreso"
+                    id="barraHabitos"
+                    style="width: 0%"
+                ></div>
+
+            </div>
+
+
+            <div
+                class="fecha-habitos"
+                id="fechaHabitos"
+            >
+                Cargando...
+            </div>
+
+        </section>
+
+
+        <!-- =====================================
+             LISTA
+        ====================================== -->
+
+        <section
+            class="lista-habitos"
+            id="listaHabitos"
+        >
+
+            <div class="habitos-cargando">
+                Cargando hábitos...
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- =========================================
+         MODAL NUEVO / EDITAR
+    ========================================== -->
+
+    <div
+        class="modal-habito-fondo"
+        id="modalHabito"
+    >
+
+        <div class="modal-habito">
+
+            <div class="modal-habito-header">
+
+                <h2 id="tituloModalHabito">
+                    Nuevo hábito
+                </h2>
+
+                <button
+                    class="cerrar-modal-habito"
+                    id="cerrarModalHabito"
+                    type="button"
+                >
+                    ✕
+                </button>
+
+            </div>
+
+
+            <div class="form-habito">
+
+                <label class="campo-habito">
+
+                    <span>
+                        Nombre
+                    </span>
+
+                    <input
+                        id="inputNombreHabito"
+                        type="text"
+                        placeholder="Ej. Leer la Biblia"
+                        maxlength="80"
+                    >
+
+                </label>
+
+
+                <div class="fila-habito">
+
+                    <label class="campo-habito campo-icono-habito">
+
+                        <span>
+                            Icono
+                        </span>
+
+                        <input
+                            id="inputIconoHabito"
+                            type="text"
+                            value="⭐"
+                            maxlength="10"
+                        >
+
+                    </label>
+
+
+                    <label class="campo-habito">
+
+                        <span>
+                            Objetivo diario
+                        </span>
+
+                        <input
+                            id="inputObjetivoHabito"
+                            type="number"
+                            min="1"
+                            step="1"
+                            value="1"
+                        >
+
+                    </label>
+
+                </div>
+
+
+                <p class="ayuda-objetivo">
+                    Ejemplo: 1 para ejercicio diario,
+                    8 para ocho vasos de agua,
+                    3 para tres sesiones de estudio.
+                </p>
+
+
+                <div
+                    class="mensaje-habito"
+                    id="mensajeHabito"
+                ></div>
+
+
+                <div class="acciones-modal-habito">
+
+                    <button
+                        class="btn-secundario-habito"
+                        id="cancelarModalHabito"
+                        type="button"
+                    >
+                        Cancelar
+                    </button>
+
+                    <button
+                        class="btn-guardar-habito"
+                        id="guardarHabito"
+                        type="button"
+                    >
+                        Guardar hábito
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================================
+         MODAL ELIMINAR
+    ========================================== -->
+
+    <div
+        class="modal-habito-fondo"
+        id="modalEliminarHabito"
+    >
+
+        <div class="modal-habito modal-eliminar-habito">
+
+            <h2>
+                Eliminar hábito
+            </h2>
+
+            <p>
+                ¿Quieres eliminar
+                <strong id="nombreEliminarHabito">
+                    este hábito
+                </strong>?
+            </p>
+
+            <p class="advertencia-habito">
+                Si ya tiene historial,
+                conservaremos sus estadísticas
+                y solamente será desactivado.
+            </p>
+
+
+            <div class="acciones-modal-habito">
+
+                <button
+                    class="btn-secundario-habito"
+                    id="cancelarEliminarHabito"
+                    type="button"
+                >
+                    Cancelar
+                </button>
+
+                <button
+                    class="btn-eliminar-habito"
+                    id="confirmarEliminarHabito"
+                    type="button"
+                >
+                    Eliminar
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <script
+        src="{{ url_for('static', filename='js/habitos.js') }}"
+    ></script>
+
+</body>
+
+</html>

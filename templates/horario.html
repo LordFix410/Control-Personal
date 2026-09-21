@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Horario - Control Personal</title>
+
+    <!-- CSS GENERAL -->
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+
+    <!-- CSS SOLO DE HORARIO -->
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/horario.css') }}"
+    >
+</head>
+
+
+<body>
+
+
+    <!-- =========================================
+         SIDEBAR
+    ========================================== -->
+
+    <aside class="sidebar">
+
+        <div class="logo">
+            🎯
+            <span>Control Personal</span>
+        </div>
+
+
+        <nav>
+
+            <button
+                class="nav-item"
+                onclick="window.location.href='/'"
+            >
+                🏠
+                <span>Hoy</span>
+            </button>
+
+
+            <button
+                class="nav-item activo"
+                onclick="window.location.href='/horario'"
+            >
+                📅
+                <span>Horario</span>
+            </button>
+
+
+            <button
+                class="nav-item"
+                onclick="window.location.href='/habitos'"
+            >
+                ✅ <span>Hábitos</span>
+            </button>
+
+
+            <button class="nav-item">
+                📊
+                <span>Progreso</span>
+            </button>
+
+
+            <button class="nav-item">
+                🎯
+                <span>Metas</span>
+            </button>
+
+
+            <button class="nav-item">
+                ⚙️
+                <span>Configuración</span>
+            </button>
+
+        </nav>
+
+    </aside>
+
+
+
+    <!-- =========================================
+         CONTENIDO
+    ========================================== -->
+
+    <main class="contenido horario-contenido">
+
+
+        <!-- =====================================
+             CABECERA
+        ====================================== -->
+
+        <header class="horario-header">
+
+            <div>
+
+                <p class="fecha">
+                    ORGANIZACIÓN SEMANAL
+                </p>
+
+                <h1>
+                    Horario
+                </h1>
+
+                <p class="horario-subtitulo">
+                    Organiza tu rutina semanal
+                </p>
+
+            </div>
+
+
+            <button
+                id="nuevaActividad"
+                class="btn-nueva"
+            >
+                ＋ Nueva actividad
+            </button>
+
+        </header>
+
+
+
+        <!-- =====================================
+             SELECTOR DE DÍAS
+        ====================================== -->
+
+        <section class="selector-dias">
+
+            <button
+                class="dia-btn"
+                data-dia="0"
+            >
+                <strong>LUN</strong>
+                <span>Lunes</span>
+            </button>
+
+
+            <button
+                class="dia-btn"
+                data-dia="1"
+            >
+                <strong>MAR</strong>
+                <span>Martes</span>
+            </button>
+
+
+            <button
+                class="dia-btn"
+                data-dia="2"
+            >
+                <strong>MIÉ</strong>
+                <span>Miércoles</span>
+            </button>
+
+
+            <button
+                class="dia-btn"
+                data-dia="3"
+            >
+                <strong>JUE</strong>
+                <span>Jueves</span>
+            </button>
+
+
+            <button
+                class="dia-btn"
+                data-dia="4"
+            >
+                <strong>VIE</strong>
+                <span>Viernes</span>
+            </button>
+
+
+            <button
+                class="dia-btn"
+                data-dia="5"
+            >
+                <strong>SÁB</strong>
+                <span>Sábado</span>
+            </button>
+
+
+            <button
+                class="dia-btn"
+                data-dia="6"
+            >
+                <strong>DOM</strong>
+                <span>Domingo</span>
+            </button>
+
+        </section>
+
+
+
+        <!-- =====================================
+             INFORMACIÓN DEL DÍA
+        ====================================== -->
+
+        <section class="dia-cabecera">
+
+            <div>
+
+                <h2 id="tituloDia">
+                    Lunes
+                </h2>
+
+                <span id="cantidadDia">
+                    0 actividades
+                </span>
+
+            </div>
+
+
+            <div id="tiempoDia">
+                0 h programadas
+            </div>
+
+        </section>
+
+
+
+        <!-- =====================================
+             LISTA DEL HORARIO
+        ====================================== -->
+
+        <section
+            id="listaHorario"
+            class="lista-horario"
+        >
+
+            <div class="horario-cargando">
+                Cargando horario...
+            </div>
+
+        </section>
+
+
+    </main>
+
+
+
+    <!-- =========================================
+         MODAL NUEVA / EDITAR ACTIVIDAD
+    ========================================== -->
+
+    <div
+        id="modalActividad"
+        class="modal-horario-fondo"
+    >
+
+        <div class="modal-horario">
+
+
+            <!-- CABECERA MODAL -->
+
+            <div class="modal-horario-header">
+
+                <h2 id="tituloModal">
+                    Nueva actividad
+                </h2>
+
+
+                <button
+                    id="cerrarModal"
+                    class="cerrar-modal"
+                    type="button"
+                >
+                    ✕
+                </button>
+
+            </div>
+
+
+
+            <!-- FORMULARIO -->
+
+            <div class="form-horario">
+
+
+                <!-- NOMBRE -->
+
+                <label class="campo">
+
+                    <span>
+                        Nombre
+                    </span>
+
+                    <input
+                        id="inputNombre"
+                        type="text"
+                        placeholder="Ej. Inglés"
+                        maxlength="80"
+                    >
+
+                </label>
+
+
+
+                <!-- ICONO / CATEGORÍA -->
+
+                <div class="fila-form">
+
+
+                    <label class="campo campo-icono">
+
+                        <span>
+                            Icono
+                        </span>
+
+                        <input
+                            id="inputIcono"
+                            type="text"
+                            value="📌"
+                            maxlength="10"
+                        >
+
+                    </label>
+
+
+
+                    <label class="campo">
+
+                        <span>
+                            Categoría
+                        </span>
+
+                        <input
+                            id="inputCategoria"
+                            type="text"
+                            placeholder="Ej. ingles"
+                            maxlength="50"
+                        >
+
+                    </label>
+
+
+                </div>
+
+
+
+                <!-- HORAS -->
+
+                <div class="fila-form">
+
+
+                    <label class="campo">
+
+                        <span>
+                            Hora de inicio
+                        </span>
+
+                        <input
+                            id="inputInicio"
+                            type="time"
+                        >
+
+                    </label>
+
+
+
+                    <label class="campo">
+
+                        <span>
+                            Hora final
+                        </span>
+
+                        <input
+                            id="inputFin"
+                            type="time"
+                        >
+
+                    </label>
+
+
+                </div>
+
+
+
+                <!-- =================================
+                     DÍAS
+                ================================== -->
+
+                <div
+                    id="contenedorDiasModal"
+                    class="campo"
+                >
+
+                    <span>
+                        Repetir en
+                    </span>
+
+
+                    <div class="dias-modal">
+
+
+                        <label>
+
+                            <input
+                                type="checkbox"
+                                value="0"
+                            >
+
+                            <span>L</span>
+
+                        </label>
+
+
+                        <label>
+
+                            <input
+                                type="checkbox"
+                                value="1"
+                            >
+
+                            <span>M</span>
+
+                        </label>
+
+
+                        <label>
+
+                            <input
+                                type="checkbox"
+                                value="2"
+                            >
+
+                            <span>X</span>
+
+                        </label>
+
+
+                        <label>
+
+                            <input
+                                type="checkbox"
+                                value="3"
+                            >
+
+                            <span>J</span>
+
+                        </label>
+
+
+                        <label>
+
+                            <input
+                                type="checkbox"
+                                value="4"
+                            >
+
+                            <span>V</span>
+
+                        </label>
+
+
+                        <label>
+
+                            <input
+                                type="checkbox"
+                                value="5"
+                            >
+
+                            <span>S</span>
+
+                        </label>
+
+
+                        <label>
+
+                            <input
+                                type="checkbox"
+                                value="6"
+                            >
+
+                            <span>D</span>
+
+                        </label>
+
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- MENSAJE -->
+
+                <div
+                    id="mensajeFormulario"
+                    class="mensaje-formulario"
+                ></div>
+
+
+
+                <!-- BOTONES -->
+
+                <div class="acciones-modal">
+
+
+                    <button
+                        id="cancelarModal"
+                        class="btn-secundario"
+                        type="button"
+                    >
+                        Cancelar
+                    </button>
+
+
+                    <button
+                        id="guardarActividad"
+                        class="btn-guardar"
+                        type="button"
+                    >
+                        Guardar actividad
+                    </button>
+
+
+                </div>
+
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =========================================
+         MODAL ELIMINAR
+    ========================================== -->
+
+    <div
+        id="modalEliminar"
+        class="modal-horario-fondo"
+    >
+
+        <div class="modal-horario modal-eliminar">
+
+
+            <h2>
+                Eliminar actividad
+            </h2>
+
+
+            <p>
+                ¿Quieres eliminar
+                <strong id="nombreEliminar">
+                    esta actividad
+                </strong>?
+            </p>
+
+
+            <p class="advertencia-eliminar">
+
+                Si esta actividad ya tiene
+                historial registrado,
+                conservaremos sus estadísticas
+                y solamente será desactivada.
+
+            </p>
+
+
+
+            <div class="acciones-modal">
+
+
+                <button
+                    id="cancelarEliminar"
+                    class="btn-secundario"
+                    type="button"
+                >
+                    Cancelar
+                </button>
+
+
+                <button
+                    id="confirmarEliminar"
+                    class="btn-eliminar-confirmar"
+                    type="button"
+                >
+                    Eliminar
+                </button>
+
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =========================================
+         JAVASCRIPT SOLO DE HORARIO
+    ========================================== -->
+
+    <script
+        src="{{ url_for('static', filename='js/horario.js') }}"
+    ></script>
+
+
+</body>
+
+</html>

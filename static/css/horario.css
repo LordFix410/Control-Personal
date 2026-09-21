@@ -1,0 +1,715 @@
+/* =========================================
+   HORARIO
+========================================= */
+
+.horario-contenido {
+    overflow-y: auto;
+}
+
+
+/* =========================================
+   CABECERA
+========================================= */
+
+.horario-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    margin-bottom: 28px;
+}
+
+.horario-header h1 {
+    font-size: 30px;
+    margin-bottom: 5px;
+}
+
+.horario-header p {
+    color: #8d94a5;
+}
+
+
+.btn-nueva {
+    border: none;
+
+    background: #6c8cff;
+    color: white;
+
+    padding: 11px 18px;
+
+    border-radius: 9px;
+
+    font-weight: 700;
+    font-family: inherit;
+
+    cursor: pointer;
+}
+
+.btn-nueva:hover {
+    filter: brightness(1.08);
+}
+
+
+/* =========================================
+   SELECTOR DE DÍAS
+========================================= */
+
+.selector-dias {
+    display: grid;
+
+    grid-template-columns:
+        repeat(7, minmax(80px, 1fr));
+
+    gap: 8px;
+
+    margin-bottom: 26px;
+}
+
+
+.dia-btn {
+    border: 1px solid #292d38;
+
+    background: #171a21;
+    color: #8d94a5;
+
+    border-radius: 10px;
+
+    padding: 12px 5px;
+
+    cursor: pointer;
+
+    font-family: inherit;
+
+    transition: .15s;
+}
+
+
+.dia-btn strong {
+    display: block;
+
+    color: #ffffff;
+
+    font-size: 14px;
+
+    margin-bottom: 3px;
+}
+
+
+.dia-btn span {
+    font-size: 11px;
+}
+
+
+.dia-btn:hover {
+    border-color: #50586c;
+
+    transform: translateY(-1px);
+}
+
+
+.dia-btn.activo {
+    background: #242c48;
+
+    border-color: #6c8cff;
+
+    color: #aebeff;
+}
+
+
+.dia-btn.activo strong {
+    color: #8fa8ff;
+}
+
+
+/* =========================================
+   CABECERA DÍA
+========================================= */
+
+.dia-cabecera {
+    display: flex;
+
+    justify-content: space-between;
+    align-items: center;
+
+    margin-bottom: 13px;
+}
+
+
+.dia-cabecera h2 {
+    font-size: 20px;
+
+    margin-bottom: 3px;
+}
+
+
+.dia-cabecera span,
+#tiempoDia {
+    color: #8d94a5;
+
+    font-size: 13px;
+}
+
+
+/* =========================================
+   LISTA
+========================================= */
+
+.lista-horario {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 7px;
+
+    padding-bottom: 40px;
+}
+
+
+.horario-cargando,
+.horario-vacio {
+    padding: 50px;
+
+    text-align: center;
+
+    color: #747b8d;
+
+    background: #171a21;
+
+    border: 1px dashed #343946;
+
+    border-radius: 12px;
+}
+
+
+/* =========================================
+   ACTIVIDAD
+========================================= */
+
+.horario-item {
+    display: grid;
+
+    grid-template-columns:
+        90px
+        50px
+        minmax(180px, 1fr)
+        145px
+        55px
+        85px;
+
+    gap: 12px;
+
+    align-items: center;
+
+    min-height: 70px;
+
+    padding: 10px 14px;
+
+    background: #171a21;
+
+    border: 1px solid #252933;
+
+    border-radius: 10px;
+
+    transition: .15s;
+}
+
+
+.horario-item:hover {
+    border-color: #3d4352;
+}
+
+
+.horario-item.desactivada {
+    opacity: .48;
+}
+
+
+.horario-hora {
+    font-weight: 800;
+
+    color: #8fa8ff;
+
+    font-size: 14px;
+}
+
+
+.horario-icono {
+    width: 42px;
+    height: 42px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    background: #21252e;
+
+    border-radius: 9px;
+
+    font-size: 21px;
+}
+
+
+.horario-info {
+    min-width: 0;
+}
+
+
+.horario-nombre {
+    font-weight: 800;
+
+    margin-bottom: 4px;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+
+.horario-categoria {
+    color: #818899;
+
+    font-size: 12px;
+}
+
+
+.horario-rango {
+    color: #a2a8b6;
+
+    font-size: 13px;
+}
+
+
+.horario-acciones {
+    display: flex;
+
+    gap: 5px;
+
+    justify-content: flex-end;
+}
+
+
+.btn-editar,
+.btn-eliminar {
+    width: 36px;
+    height: 36px;
+
+    border: none;
+
+    border-radius: 7px;
+
+    cursor: pointer;
+
+    background: #242833;
+    color: #c3c8d4;
+
+    font-family: inherit;
+}
+
+
+.btn-editar:hover {
+    background: #303b60;
+    color: #9fb3ff;
+}
+
+
+.btn-eliminar:hover {
+    background: #46262b;
+    color: #ff8c94;
+}
+
+
+/* =========================================
+   SWITCH
+========================================= */
+
+.switch {
+    position: relative;
+
+    width: 42px;
+    height: 23px;
+
+    display: inline-block;
+}
+
+
+.switch input {
+    display: none;
+}
+
+
+.switch-slider {
+    position: absolute;
+
+    inset: 0;
+
+    background: #343946;
+
+    border-radius: 20px;
+
+    cursor: pointer;
+
+    transition: .2s;
+}
+
+
+.switch-slider::before {
+    content: "";
+
+    position: absolute;
+
+    width: 17px;
+    height: 17px;
+
+    left: 3px;
+    top: 3px;
+
+    background: white;
+
+    border-radius: 50%;
+
+    transition: .2s;
+}
+
+
+.switch input:checked + .switch-slider {
+    background: #6c8cff;
+}
+
+
+.switch input:checked + .switch-slider::before {
+    transform: translateX(19px);
+}
+
+
+/* =========================================
+   MODALES
+========================================= */
+
+.modal-horario-fondo {
+    position: fixed;
+
+    inset: 0;
+
+    display: none;
+
+    align-items: center;
+    justify-content: center;
+
+    background: rgba(0, 0, 0, .70);
+
+    z-index: 1000;
+
+    padding: 20px;
+}
+
+
+.modal-horario-fondo.visible {
+    display: flex;
+}
+
+
+.modal-horario {
+    width: min(520px, 100%);
+
+    background: #191c24;
+
+    border: 1px solid #303541;
+
+    border-radius: 14px;
+
+    padding: 22px;
+
+    box-shadow:
+        0 20px 70px rgba(0, 0, 0, .45);
+}
+
+
+.modal-horario-header {
+    display: flex;
+
+    justify-content: space-between;
+    align-items: center;
+
+    margin-bottom: 22px;
+}
+
+
+.modal-horario-header h2 {
+    font-size: 21px;
+}
+
+
+.cerrar-modal {
+    border: none;
+
+    background: transparent;
+    color: #969dad;
+
+    cursor: pointer;
+
+    font-size: 17px;
+}
+
+
+/* =========================================
+   FORMULARIO
+========================================= */
+
+.form-horario {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 16px;
+}
+
+
+.fila-form {
+    display: grid;
+
+    grid-template-columns: 1fr 1fr;
+
+    gap: 12px;
+}
+
+
+.campo {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 7px;
+}
+
+
+.campo > span {
+    color: #a5abba;
+
+    font-size: 12px;
+
+    font-weight: 700;
+}
+
+
+.campo input {
+    width: 100%;
+
+    border: 1px solid #343946;
+
+    background: #11141a;
+
+    color: white;
+
+    border-radius: 8px;
+
+    padding: 10px;
+
+    outline: none;
+
+    font-family: inherit;
+}
+
+
+.campo input:focus {
+    border-color: #6c8cff;
+}
+
+
+.campo-icono {
+    max-width: 110px;
+}
+
+
+/* =========================================
+   DÍAS MODAL
+========================================= */
+
+.dias-modal {
+    display: flex;
+
+    gap: 7px;
+
+    flex-wrap: wrap;
+}
+
+
+.dias-modal label input {
+    display: none;
+}
+
+
+.dias-modal label span {
+    width: 38px;
+    height: 38px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    background: #252933;
+
+    color: #a5abba;
+
+    border: 1px solid #343946;
+
+    border-radius: 8px;
+
+    cursor: pointer;
+
+    font-weight: 800;
+}
+
+
+.dias-modal label input:checked + span {
+    background: #29345c;
+
+    color: #9fb3ff;
+
+    border-color: #6c8cff;
+}
+
+
+/* =========================================
+   MENSAJE
+========================================= */
+
+.mensaje-formulario {
+    min-height: 18px;
+
+    color: #ff8b93;
+
+    font-size: 12px;
+}
+
+
+/* =========================================
+   BOTONES MODAL
+========================================= */
+
+.acciones-modal {
+    display: flex;
+
+    justify-content: flex-end;
+
+    gap: 8px;
+
+    margin-top: 5px;
+}
+
+
+.btn-secundario,
+.btn-guardar,
+.btn-eliminar-confirmar {
+    border: none;
+
+    padding: 10px 15px;
+
+    border-radius: 8px;
+
+    font-family: inherit;
+
+    font-weight: 700;
+
+    cursor: pointer;
+}
+
+
+.btn-secundario {
+    background: #292d37;
+    color: #c0c5d0;
+}
+
+
+.btn-guardar {
+    background: #6c8cff;
+    color: white;
+}
+
+
+.btn-eliminar-confirmar {
+    background: #c64e58;
+    color: white;
+}
+
+
+.modal-eliminar p {
+    margin-top: 13px;
+
+    color: #b5bbc8;
+
+    line-height: 1.5;
+}
+
+
+.advertencia-eliminar {
+    font-size: 12px;
+
+    color: #838a9b !important;
+
+    margin-bottom: 18px;
+}
+
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 950px) {
+
+    .selector-dias {
+        grid-template-columns:
+            repeat(4, 1fr);
+    }
+
+
+    .horario-item {
+        grid-template-columns:
+            75px
+            42px
+            1fr
+            55px
+            80px;
+    }
+
+
+    .horario-rango {
+        display: none;
+    }
+}
+
+
+@media (max-width: 700px) {
+
+    .selector-dias {
+        grid-template-columns:
+            repeat(3, 1fr);
+    }
+
+
+    .horario-header {
+        align-items: flex-start;
+
+        gap: 15px;
+    }
+
+
+    .horario-item {
+        grid-template-columns:
+            65px
+            40px
+            minmax(100px, 1fr)
+            75px;
+    }
+
+
+    .horario-item .switch {
+        display: none;
+    }
+
+
+    .fila-form {
+        grid-template-columns: 1fr;
+    }
+}

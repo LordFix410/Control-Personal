@@ -300,3 +300,535 @@ h1 {
         font-size: 40px;
     }
 }
+/* =========================================
+   RESUMEN DEL DÍA
+========================================= */
+
+.resumen-dia {
+    display: flex;
+    gap: 25px;
+
+    margin-top: 12px;
+
+    color: #8d94a3;
+
+    font-size: 13px;
+}
+
+
+/* =========================================
+   CABECERA ACTIVIDAD
+========================================= */
+
+.cabecera-actividad {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.estado-actividad {
+    background: #252a34;
+    color: #aeb5c2;
+
+    padding: 7px 12px;
+
+    border-radius: 20px;
+
+    font-size: 11px;
+    font-weight: 700;
+}
+
+
+/* =========================================
+   CONTROL DEL TIEMPO
+========================================= */
+
+.control-tiempo {
+    display: flex;
+
+    align-items: flex-end;
+    justify-content: center;
+
+    gap: 35px;
+
+    margin-top: 30px;
+}
+
+.tiempo-principal {
+    text-align: center;
+}
+
+.titulo-tiempo {
+    color: #777f8e;
+
+    font-size: 12px;
+}
+
+.temporizador {
+    margin: 5px 0;
+
+    font-size: 55px;
+}
+
+.objetivo-tiempo {
+    display: flex;
+    flex-direction: column;
+
+    margin-bottom: 10px;
+
+    color: #777f8e;
+
+    font-size: 12px;
+}
+
+.objetivo-tiempo strong {
+    color: #ffffff;
+
+    font-size: 18px;
+
+    margin-top: 3px;
+}
+
+
+/* =========================================
+   BARRA DEL TIEMPO
+========================================= */
+
+.barra-tiempo {
+    max-width: 600px;
+
+    height: 7px;
+
+    margin: 15px auto 0;
+
+    background: #252933;
+
+    border-radius: 20px;
+
+    overflow: hidden;
+}
+
+.barra-tiempo-progreso {
+    height: 100%;
+
+    width: 0%;
+
+    background: #6c8cff;
+
+    border-radius: 20px;
+
+    transition: width .3s;
+}
+
+.porcentaje-tiempo {
+    text-align: center;
+
+    margin-top: 8px;
+    margin-bottom: 25px;
+
+    color: #777f8e;
+
+    font-size: 12px;
+}
+
+
+/* =========================================
+   SIGUIENTE
+========================================= */
+
+.siguiente-titulo {
+    display: block;
+
+    color: #747c89;
+
+    font-size: 12px;
+
+    margin-bottom: 5px;
+}
+
+.siguiente-contenido strong {
+    display: block;
+}
+
+.siguiente-hora {
+    font-size: 18px;
+}
+
+
+/* =========================================
+   PLAN DE HOY
+========================================= */
+
+.plan-hoy {
+    background: #181c23;
+
+    border: 1px solid #292e38;
+
+    border-radius: 18px;
+
+    padding: 25px;
+
+    margin-top: 20px;
+    margin-bottom: 50px;
+}
+
+.plan-cabecera {
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    margin-bottom: 25px;
+}
+
+.plan-cabecera h2 {
+    margin-top: 5px;
+
+    font-size: 22px;
+}
+
+.plan-contador {
+    background: #222731;
+
+    padding: 9px 14px;
+
+    border-radius: 10px;
+
+    color: #9299a6;
+}
+
+.plan-contador strong {
+    color: #ffffff;
+}
+
+
+/* LISTA */
+
+.lista-actividades {
+    display: flex;
+    flex-direction: column;
+
+    gap: 8px;
+}
+
+.actividad-plan {
+    display: grid;
+
+    grid-template-columns:
+        42px
+        minmax(180px, 1fr)
+        160px
+        100px
+        145px;
+
+    align-items: center;
+
+    gap: 12px;
+
+    padding: 13px 15px;
+
+    background: #1d2129;
+
+    border: 1px solid transparent;
+
+    border-radius: 12px;
+
+    transition:
+        background .2s,
+        border-color .2s;
+}
+
+.actividad-plan:hover {
+    background: #222730;
+
+    border-color: #343a46;
+}
+
+
+/* ESTADO */
+
+.plan-estado {
+    width: 32px;
+    height: 32px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: #292e38;
+
+    color: #9097a5;
+
+    font-weight: bold;
+}
+
+
+/* INFORMACIÓN */
+
+.plan-info {
+    min-width: 0;
+}
+
+.plan-nombre {
+    display: flex;
+    align-items: center;
+
+    gap: 8px;
+
+    font-weight: 600;
+}
+
+.plan-categoria {
+    display: block;
+
+    color: #737b89;
+
+    font-size: 11px;
+
+    margin-top: 3px;
+
+    text-transform: capitalize;
+}
+
+.plan-horario {
+    color: #9aa1ad;
+
+    font-size: 13px;
+}
+
+.plan-duracion {
+    color: #777f8d;
+
+    font-size: 12px;
+}
+
+
+/* BOTÓN DEL PLAN */
+
+.btn-plan {
+    border: none;
+
+    background: #293247;
+    color: #aebeff;
+
+    padding: 9px 12px;
+
+    border-radius: 8px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+}
+
+.btn-plan:hover {
+    background: #34415e;
+
+    color: white;
+}
+
+
+/* ESTADOS */
+
+.actividad-plan.en-progreso {
+    border-color: #6c8cff;
+
+    background: #202637;
+}
+
+.actividad-plan.en-progreso .plan-estado {
+    background: #314166;
+    color: #8ca6ff;
+}
+
+.actividad-plan.pausada .plan-estado {
+    background: #4b4026;
+    color: #ffd36c;
+}
+
+.actividad-plan.completada {
+    opacity: .65;
+}
+
+.actividad-plan.completada .plan-estado {
+    background: #263c2d;
+    color: #6edc8c;
+}
+
+.actividad-plan.omitida {
+    opacity: .55;
+}
+
+.actividad-plan.omitida .plan-estado {
+    background: #462a2d;
+    color: #ff7c83;
+}
+
+.cargando-plan {
+    text-align: center;
+
+    color: #737b89;
+
+    padding: 30px;
+}
+
+
+/* =========================================
+   MODAL
+========================================= */
+
+.modal-fondo {
+    position: fixed;
+
+    inset: 0;
+
+    background: rgba(0, 0, 0, .72);
+
+    display: none;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 20px;
+
+    z-index: 1000;
+}
+
+.modal-fondo.visible {
+    display: flex;
+}
+
+.modal {
+    width: 100%;
+    max-width: 430px;
+
+    background: #191d24;
+
+    border: 1px solid #303641;
+
+    border-radius: 18px;
+
+    padding: 30px;
+
+    text-align: center;
+
+    box-shadow:
+        0 25px 70px rgba(0, 0, 0, .45);
+}
+
+.modal-icono {
+    font-size: 35px;
+
+    margin-bottom: 12px;
+}
+
+.modal h2 {
+    font-size: 21px;
+
+    margin-bottom: 10px;
+}
+
+.modal p {
+    color: #8f96a3;
+
+    font-size: 14px;
+
+    line-height: 1.5;
+}
+
+.modal-actividad-actual {
+    display: flex;
+
+    justify-content: space-between;
+    align-items: center;
+
+    background: #222731;
+
+    padding: 14px;
+
+    border-radius: 10px;
+
+    margin: 20px 0;
+}
+
+.modal-actividad-actual span {
+    font-weight: 600;
+}
+
+.modal-actividad-actual strong {
+    color: #8ca6ff;
+}
+
+.modal-pregunta {
+    margin-bottom: 20px;
+}
+
+.modal-botones {
+    display: flex;
+
+    justify-content: center;
+
+    gap: 10px;
+}
+
+.modal-cancelar {
+    background: #292e38;
+    color: #b1b7c2;
+}
+
+
+/* =========================================
+   RESPONSIVE PLAN
+========================================= */
+
+@media (max-width: 850px) {
+
+    .actividad-plan {
+        grid-template-columns:
+            35px
+            1fr
+            auto;
+    }
+
+    .plan-horario,
+    .plan-duracion {
+        display: none;
+    }
+}
+/* =========================================
+   ACCIONES PLAN
+========================================= */
+
+.plan-acciones {
+    display: flex;
+
+    justify-content: flex-end;
+
+    gap: 6px;
+}
+
+.btn-omitir {
+    width: 35px;
+
+    border: none;
+
+    border-radius: 8px;
+
+    background: #352529;
+    color: #e4777d;
+
+    cursor: pointer;
+
+    font-weight: bold;
+}
+
+.btn-omitir:hover {
+    background: #4a2b30;
+    color: #ff969b;
+}
+
+.btn-plan:disabled {
+    cursor: default;
+    opacity: .65;
+}

@@ -1,9 +1,7 @@
 <!DOCTYPE html>
-
 <html lang="es">
 
 <head>
-
     <meta charset="UTF-8">
 
     <meta
@@ -17,10 +15,13 @@
         rel="stylesheet"
         href="{{ url_for('static', filename='css/style.css') }}"
     >
-
 </head>
 
 <body>
+
+    <!-- =========================================
+         SIDEBAR
+    ========================================== -->
 
     <aside class="sidebar">
 
@@ -35,11 +36,17 @@
                 🏠 <span>Hoy</span>
             </button>
 
-            <button class="nav-item">
+            <button
+                class="nav-item"
+                onclick="window.location.href='/horario'"
+            >
                 📅 <span>Horario</span>
             </button>
 
-            <button class="nav-item">
+            <button
+                class="nav-item"
+                onclick="window.location.href='/habitos'"
+            >
                 ✅ <span>Hábitos</span>
             </button>
 
@@ -60,13 +67,22 @@
     </aside>
 
 
+    <!-- =========================================
+         CONTENIDO
+    ========================================== -->
+
     <main class="contenido">
+
+        <!-- CABECERA -->
 
         <header>
 
             <div>
 
-                <p class="fecha" id="fecha">
+                <p
+                    class="fecha"
+                    id="fecha"
+                >
                     Cargando...
                 </p>
 
@@ -77,11 +93,19 @@
             </div>
 
             <div class="racha">
-                🔥 <strong>0</strong> días
+                🔥
+                <strong id="rachaDias">
+                    0
+                </strong>
+                días
             </div>
 
         </header>
 
+
+        <!-- =====================================
+             PROGRESO GENERAL
+        ====================================== -->
 
         <section class="progreso">
 
@@ -91,7 +115,7 @@
                     Progreso de hoy
                 </span>
 
-                <strong>
+                <strong id="porcentajeProgreso">
                     0%
                 </strong>
 
@@ -101,19 +125,64 @@
 
                 <div
                     class="barra-progreso"
+                    id="barraProgreso"
                     style="width: 0%"
                 ></div>
+
+            </div>
+
+            <div class="resumen-dia">
+
+                <span>
+                    ✓
+                    <strong id="cantidadCompletadas">
+                        0
+                    </strong>
+                    completadas
+                </span>
+
+                <span>
+                    ○
+                    <strong id="cantidadPendientes">
+                        0
+                    </strong>
+                    pendientes
+                </span>
+
+                <span>
+                    ✕
+                    <strong id="cantidadOmitidas">
+                        0
+                    </strong>
+                    omitidas
+                </span>
 
             </div>
 
         </section>
 
 
+        <!-- =====================================
+             ACTIVIDAD ACTIVA
+        ====================================== -->
+
         <section class="actividad">
 
-            <span class="etiqueta">
-                AHORA
-            </span>
+            <div class="cabecera-actividad">
+
+                <span class="etiqueta">
+                    ACTIVIDAD ACTUAL
+                </span>
+
+                <span
+                    class="estado-actividad"
+                    id="estadoActividad"
+                >
+                    ○ PENDIENTE
+                </span>
+
+            </div>
+
 
             <div class="actividad-principal">
 
@@ -124,7 +193,8 @@
                     ⏳
                 </div>
 
-                <div>
+
+                <div class="actividad-datos">
 
                     <h2 id="actividadNombre">
                         Cargando...
@@ -143,13 +213,64 @@
             </div>
 
 
-            <div
-                class="temporizador"
-                id="temporizador"
-            >
-                00:00:00
+            <!-- TIEMPO -->
+
+            <div class="control-tiempo">
+
+                <div class="tiempo-principal">
+
+                    <span class="titulo-tiempo">
+                        Tiempo realizado
+                    </span>
+
+                    <div
+                        class="temporizador"
+                        id="temporizador"
+                    >
+                        00:00:00
+                    </div>
+
+                </div>
+
+
+                <div class="objetivo-tiempo">
+
+                    <span>
+                        Objetivo
+                    </span>
+
+                    <strong id="tiempoObjetivo">
+                        --:--
+                    </strong>
+
+                </div>
+
             </div>
 
+
+            <!-- BARRA TIEMPO -->
+
+            <div class="barra-tiempo">
+
+                <div
+                    class="barra-tiempo-progreso"
+                    id="barraTiempo"
+                    style="width: 0%"
+                ></div>
+
+            </div>
+
+
+            <div class="porcentaje-tiempo">
+
+                <span id="textoTiempo">
+                    0% del tiempo objetivo
+                </span>
+
+            </div>
+
+
+            <!-- BOTONES -->
 
             <div class="acciones">
 
@@ -172,19 +293,34 @@
         </section>
 
 
+        <!-- =====================================
+             SIGUIENTE
+        ====================================== -->
+
         <section class="siguiente">
 
             <span class="etiqueta">
-                SIGUIENTE
+                SEGÚN TU HORARIO
             </span>
 
             <div class="siguiente-contenido">
 
-                <span id="siguienteNombre">
-                    Cargando...
-                </span>
+                <div>
 
-                <strong id="siguienteHora">
+                    <span class="siguiente-titulo">
+                        Siguiente
+                    </span>
+
+                    <strong id="siguienteNombre">
+                        Cargando...
+                    </strong>
+
+                </div>
+
+                <strong
+                    class="siguiente-hora"
+                    id="siguienteHora"
+                >
                     --:--
                 </strong>
 
@@ -192,7 +328,129 @@
 
         </section>
 
+
+        <!-- =====================================
+             PLAN DE HOY
+        ====================================== -->
+
+        <section class="plan-hoy">
+
+            <div class="plan-cabecera">
+
+                <div>
+
+                    <span class="etiqueta">
+                        PLAN DE HOY
+                    </span>
+
+                    <h2>
+                        Tus actividades
+                    </h2>
+
+                </div>
+
+
+                <div class="plan-contador">
+
+                    <strong id="planCompletadas">
+                        0
+                    </strong>
+
+                    <span>/</span>
+
+                    <span id="planTotal">
+                        0
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <!--
+                JavaScript colocará aquí
+                todas las actividades.
+            -->
+
+            <div
+                class="lista-actividades"
+                id="listaActividades"
+            >
+
+                <div class="cargando-plan">
+                    Cargando horario...
+                </div>
+
+            </div>
+
+        </section>
+
     </main>
+
+
+    <!-- =========================================
+         MODAL CAMBIAR ACTIVIDAD
+    ========================================== -->
+
+    <div
+        class="modal-fondo"
+        id="modalCambio"
+    >
+
+        <div class="modal">
+
+            <div class="modal-icono">
+                ⏱️
+            </div>
+
+            <h2>
+                Ya tienes una actividad activa
+            </h2>
+
+            <p id="modalTexto">
+                Actualmente estás realizando otra actividad.
+            </p>
+
+
+            <div class="modal-actividad-actual">
+
+                <span id="modalActividadActual">
+                    --
+                </span>
+
+                <strong id="modalTiempoActual">
+                    00:00:00
+                </strong>
+
+            </div>
+
+
+            <p class="modal-pregunta">
+                ¿Quieres pausarla e iniciar la nueva actividad?
+            </p>
+
+
+            <div class="modal-botones">
+
+                <button
+                    class="btn modal-cancelar"
+                    id="cancelarCambio"
+                >
+                    Cancelar
+                </button>
+
+                <button
+                    class="btn iniciar"
+                    id="confirmarCambio"
+                >
+                    ⏸ Pausar e iniciar
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
 
 
     <script
