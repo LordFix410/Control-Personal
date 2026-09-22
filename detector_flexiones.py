@@ -1,4 +1,6 @@
 import cv2
+import argparse
+import json
 import mediapipe as mp
 import numpy as np
 import math
@@ -10,6 +12,15 @@ import pyttsx3
 
 from mediapipe.tasks import python
 from mediapipe.tasks.python import vision
+
+parser = argparse.ArgumentParser()
+parser.add_argument(
+    "--resultado",
+    default=None,
+    help="Archivo JSON donde guardar el resultado del entrenamiento."
+)
+ARGS = parser.parse_args()
+
 
 # ============================================================
 # CONFIGURACION
@@ -434,8 +445,21 @@ try:
                     cv2.FONT_HERSHEY_SIMPLEX, 0.72, (255,255,255), 2, cv2.LINE_AA)
 
         cv2.imshow(NOMBRE, frame)
+
         tecla = cv2.waitKey(1) & 0xFF
-        if tecla == ord("q"):
+
+        # Cerrar con Q o ESC
+        if tecla == ord("q") or tecla == 27:
+            break
+
+        # Cerrar al pulsar la X de la ventana
+        try:
+            if cv2.getWindowProperty(
+                NOMBRE,
+                cv2.WND_PROP_VISIBLE
+            ) < 1:
+                break
+        except cv2.error:
             break
 
 finally:
@@ -448,4 +472,41 @@ finally:
     landmarker.close()
     cv2.destroyAllWindows()
 
-print(f"Terminado. Flexiones completas: {validas}. Incompletas: {no_contadas}.")
+duracion_final = 0
+
+if inicio_entreno is not None:
+    duracion_final = int(
+        time.perf_counter() - inicio_entreno
+    )
+
+resultado_final = {
+    "tipo": "flexiones",
+    "repeticiones": validas,
+    "incompletas": no_contadas,
+    "duracion_segundos": duracion_final
+}
+
+if ARGS.resultado:
+    try:
+        with open(
+            ARGS.resultado,
+            "w",
+            encoding="utf-8"
+        ) as archivo:
+            json.dump(
+                resultado_final,
+                archivo,
+                ensure_ascii=False,
+                indent=2
+            )
+    except Exception as error:
+        print(
+            "No se pudo guardar el resultado:",
+            error
+        )
+
+print(
+    f"Terminado. Flexiones completas: {validas}. "
+    f"Incompletas: {no_contadas}. "
+    f"Duración: {duracion_final}s."
+)

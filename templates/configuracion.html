@@ -14,6 +14,8 @@
         Configuración - Control Personal
     </title>
 
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+
     <link
         rel="stylesheet"
         href="{{ url_for('static', filename='css/style.css') }}"
@@ -557,21 +559,17 @@
 
                     <div>
 
-                        <div class="titulo-proximamente">
+                        <div>
 
                             <strong>
                                 Cámara para ejercicio
                             </strong>
 
-                            <span>
-                                PRÓXIMAMENTE
-                            </span>
-
                         </div>
 
                         <p>
-                            Utilizar la cámara para contar
-                            repeticiones de ejercicio.
+                            Abrir automáticamente el entrenador
+                            al iniciar una actividad de ejercicio.
                         </p>
 
                     </div>
@@ -582,7 +580,6 @@
                         <input
                             type="checkbox"
                             id="camaraHabilitada"
-                            disabled
                         >
 
                         <span
@@ -590,6 +587,60 @@
                         ></span>
 
                     </label>
+
+                </div>
+
+                <div class="opcion-configuracion">
+
+                    <div>
+
+                        <div>
+                            <strong>
+                                🧠 Control de concentración
+                            </strong>
+                        </div>
+
+                        <p>
+                            Pausar el tiempo si dejas de estar frente
+                            al equipo y reanudarlo cuando regreses.
+                        </p>
+
+                    </div>
+
+                    <label class="switch-config">
+                        <input
+                            type="checkbox"
+                            id="concentracionCamara"
+                        >
+                        <span class="switch-config-slider"></span>
+                    </label>
+
+                </div>
+
+
+                <div class="opcion-configuracion">
+
+                    <div>
+                        <strong>
+                            Tolerancia sin presencia
+                        </strong>
+
+                        <p>
+                            Tiempo que puedes ausentarte antes de
+                            pausar automáticamente el temporizador.
+                        </p>
+                    </div>
+
+                    <select
+                        class="select-config"
+                        id="concentracionTolerancia"
+                    >
+                        <option value="5">5 segundos</option>
+                        <option value="10">10 segundos</option>
+                        <option value="15">15 segundos</option>
+                        <option value="20">20 segundos</option>
+                        <option value="30">30 segundos</option>
+                    </select>
 
                 </div>
 

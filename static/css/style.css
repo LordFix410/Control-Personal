@@ -1051,3 +1051,329 @@ h1 {
 .btn-deteccion-ignorar:hover {
     background: #d6dae1;
 }
+
+/* =========================================
+   MÓVIL - INDEX
+   ========================================= */
+@media (max-width: 700px) {
+    html, body {
+        width: 100%;
+        min-width: 0;
+        overflow-x: hidden;
+    }
+
+    body {
+        display: block;
+        padding-bottom: 78px;
+    }
+
+    .sidebar {
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        top: auto;
+        z-index: 900;
+
+        width: 100%;
+        min-height: 0;
+        height: 68px;
+        padding: 6px 8px;
+
+        border-right: 0;
+        border-top: 1px solid #292d36;
+    }
+
+    .logo {
+        display: none;
+    }
+
+    .sidebar nav {
+        width: 100%;
+        height: 100%;
+        display: grid;
+        grid-template-columns: repeat(6, minmax(0, 1fr));
+        gap: 3px;
+    }
+
+    .nav-item {
+        min-width: 0;
+        height: 100%;
+        padding: 6px 2px;
+        border-radius: 9px;
+        text-align: center;
+        font-size: 20px;
+        line-height: 1;
+    }
+
+    .sidebar .nav-item span {
+        display: none;
+    }
+
+    .contenido {
+        width: 100%;
+        max-width: none;
+        margin: 0;
+        padding: 18px 12px 12px;
+    }
+
+    header {
+        gap: 10px;
+        margin-bottom: 22px;
+        align-items: flex-start;
+    }
+
+    .fecha {
+        font-size: 13px;
+    }
+
+    h1 {
+        font-size: 27px;
+    }
+
+    .racha {
+        flex: 0 0 auto;
+        padding: 9px 11px;
+        font-size: 13px;
+        white-space: nowrap;
+    }
+
+    .progreso {
+        margin-bottom: 20px;
+    }
+
+    .resumen-dia {
+        width: 100%;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 5px;
+        font-size: 11px;
+        text-align: center;
+    }
+
+    .resumen-dia span {
+        min-width: 0;
+    }
+
+    .actividad {
+        padding: 18px 14px;
+        border-radius: 15px;
+    }
+
+    .cabecera-actividad {
+        gap: 8px;
+    }
+
+    .estado-actividad {
+        padding: 6px 9px;
+        font-size: 10px;
+        white-space: nowrap;
+    }
+
+    .actividad-principal {
+        gap: 12px;
+        margin-top: 16px;
+    }
+
+    .actividad-icono {
+        width: 52px;
+        height: 52px;
+        flex: 0 0 52px;
+        border-radius: 12px;
+        font-size: 25px;
+    }
+
+    .actividad-datos {
+        min-width: 0;
+    }
+
+    .actividad-principal h2 {
+        font-size: 21px;
+        overflow-wrap: anywhere;
+    }
+
+    .actividad-principal p,
+    .actividad-principal span {
+        font-size: 12px;
+    }
+
+    .control-tiempo {
+        width: 100%;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        align-items: end;
+        gap: 12px;
+        margin-top: 24px;
+    }
+
+    .tiempo-principal {
+        min-width: 0;
+    }
+
+    .temporizador {
+        margin: 4px 0;
+        font-size: clamp(36px, 12vw, 52px);
+        letter-spacing: 1px;
+        line-height: 1.05;
+        white-space: nowrap;
+    }
+
+    .objetivo-tiempo {
+        margin-bottom: 4px;
+    }
+
+    .objetivo-tiempo strong {
+        font-size: 16px;
+    }
+
+    .acciones {
+        width: 100%;
+        gap: 8px;
+    }
+
+    .acciones .btn {
+        flex: 1 1 0;
+        min-height: 48px;
+        padding: 12px 8px;
+        font-size: 14px;
+    }
+
+    .siguiente {
+        padding: 17px 14px;
+    }
+
+    .siguiente-contenido {
+        gap: 10px;
+        align-items: center;
+    }
+
+    .siguiente-contenido > div {
+        min-width: 0;
+    }
+
+    #siguienteNombre {
+        overflow-wrap: anywhere;
+    }
+
+    .siguiente-hora {
+        flex: 0 0 auto;
+        font-size: 16px;
+        white-space: nowrap;
+    }
+
+    .plan-hoy {
+        margin-top: 14px;
+        margin-bottom: 15px;
+        padding: 17px 12px;
+        border-radius: 15px;
+    }
+
+    .plan-cabecera {
+        margin-bottom: 16px;
+    }
+
+    .plan-cabecera h2 {
+        font-size: 19px;
+    }
+
+    .plan-contador {
+        padding: 7px 10px;
+        font-size: 13px;
+    }
+
+    .actividad-plan {
+        width: 100%;
+        grid-template-columns: 34px minmax(0, 1fr) auto;
+        gap: 8px;
+        padding: 11px 9px;
+    }
+
+    .plan-estado {
+        width: 30px;
+        height: 30px;
+    }
+
+    .plan-nombre {
+        gap: 5px;
+        font-size: 13px;
+        overflow-wrap: anywhere;
+    }
+
+    .plan-categoria {
+        font-size: 10px;
+    }
+
+    .plan-acciones {
+        gap: 4px;
+    }
+
+    .btn-plan {
+        min-height: 38px;
+        padding: 8px 9px;
+        font-size: 12px;
+    }
+
+    .btn-omitir {
+        width: 36px;
+        min-width: 36px;
+        min-height: 38px;
+    }
+
+    .modal-fondo {
+        padding: 12px;
+    }
+
+    .modal {
+        max-height: calc(100dvh - 24px);
+        overflow-y: auto;
+        padding: 22px 16px;
+        border-radius: 15px;
+    }
+
+    .modal-botones {
+        width: 100%;
+    }
+
+    .modal-botones .btn {
+        flex: 1 1 0;
+        min-height: 46px;
+        padding: 10px 8px;
+    }
+
+    #contenedor-notificaciones {
+        left: 10px;
+        right: 10px;
+        bottom: 80px;
+        width: auto;
+    }
+
+    .notificacion-app {
+        padding: 15px 44px 15px 15px;
+        min-height: 0;
+    }
+}
+
+@media (max-width: 380px) {
+    .contenido {
+        padding-left: 9px;
+        padding-right: 9px;
+    }
+
+    .actividad {
+        padding-left: 11px;
+        padding-right: 11px;
+    }
+
+    .temporizador {
+        font-size: 34px;
+    }
+
+    .objetivo-tiempo strong {
+        font-size: 14px;
+    }
+
+    .btn-plan {
+        padding-left: 7px;
+        padding-right: 7px;
+    }
+}
