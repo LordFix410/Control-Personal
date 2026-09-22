@@ -6,6 +6,9 @@ from flask import (
 )
 import sqlite3
 import os
+import sys
+import json
+import subprocess
 import threading
 import time
 from datetime import datetime, timedelta
@@ -23,12 +26,75 @@ seguimiento_automatico = {
     "duolingo": None,
     "kodree": None
 }
+# =========================================================
+# DISTRACCIONES
+# =========================================================
+
+DISTRACCIONES_PC = {
+    "youtube",
+    "instagram",
+    "facebook",
+    "roblox"
+}
+
+TIEMPO_DISTRACCION_PC = 10
+
+distraccion_pc_desde = None
+distraccion_pc_sesion = None
+# =========================================================
+# ESTADO DEL TELÉFONO
+# =========================================================
+
+estado_telefono = {
+    "conectado": False,
+    "activo": False,
+    "paquete": None,
+    "timestamp_android": None,
+    "ultima_comunicacion": None
+}
+
+estado_telefono_lock = threading.Lock()
+# =========================================================
+# CONTROL DE CONCENTRACIÓN POR TELÉFONO
+# =========================================================
+
+telefono_distraccion_desde = None
+telefono_sin_distraccion_desde = None
+telefono_pausada_automaticamente = None
+
+TELEFONO_TOLERANCIA = 10
+TELEFONO_TIEMPO_REANUDAR = 2
+
+APPS_INGLES_PERMITIDAS = {
+    "com.duolingo"
+}
+
+APPS_BIBLIA_PERMITIDAS = {
+    "com.sirma.mobile.bible.android",
+    "va.mybible",
+    "com.android.chrome"
+}
 
 
 ultima_deteccion = {
     "duolingo": None,
     "kodree": None
 }
+
+def es_aplicacion_distractora(texto):
+
+    texto = (
+        texto or ""
+    ).strip().lower()
+
+    if not texto:
+        return False
+
+    return any(
+        enemigo in texto
+        for enemigo
+        in APLICACIONES_DISTRACTORAS
+    )
 
 def crear_notificacion(titulo, mensaje, tipo="info"):
 
@@ -112,6 +178,20 @@ def crear_base_datos():
     """)
 
     cursor.execute("""
+        CREATE TABLE IF NOT EXISTS ejercicios (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            sesion_id INTEGER NOT NULL,
+            fecha TEXT NOT NULL,
+            tipo TEXT NOT NULL DEFAULT 'flexiones',
+            repeticiones INTEGER DEFAULT 0,
+            duracion_segundos INTEGER DEFAULT 0,
+            creado_en TEXT NOT NULL,
+            FOREIGN KEY (sesion_id)
+                REFERENCES sesiones(id)
+        )
+    """)
+
+    cursor.execute("""
         CREATE TABLE IF NOT EXISTS habitos (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             nombre TEXT NOT NULL,
@@ -164,7 +244,9 @@ def crear_base_datos():
         "detectar_duolingo": "1",
         "detectar_kodree": "1",
         "tema": "oscuro",
-        "camara_habilitada": "0"
+        "camara_habilitada": "0",
+        "concentracion_camara": "0",
+        "concentracion_tolerancia": "10"
     }
 
     for clave, valor in configuracion_inicial.items():
@@ -638,7 +720,9 @@ def guardar_configuracion():
         "detectar_duolingo",
         "detectar_kodree",
         "tema",
-        "camara_habilitada"
+        "camara_habilitada",
+        "concentracion_camara",
+        "concentracion_tolerancia"
     }
 
     conexion = conectar()
@@ -1721,6 +1805,78 @@ def completar_sesion():
     })
 
 #nuevo endpoint
+# =========================================================
+# API - MONITOR DEL TELÉFONO
+# =========================================================
+
+@app.route("/api/telefono/estado", methods=["POST"])
+def recibir_estado_telefono():
+
+    datos = request.get_json(silent=True) or {}
+
+    paquete = str(
+        datos.get("paquete", "")
+    ).strip()
+
+    activo = bool(
+        datos.get("activo", False)
+    )
+
+    timestamp_android = datos.get(
+        "timestamp"
+    )
+
+    
+
+    ahora = time.time()
+
+    with estado_telefono_lock:
+
+        estado_telefono["conectado"] = True
+        estado_telefono["activo"] = activo
+        estado_telefono["paquete"] = paquete
+        estado_telefono["timestamp_android"] = timestamp_android
+        estado_telefono["ultima_comunicacion"] = ahora
+
+    print(
+        f"[TELÉFONO] "
+        f"activo={activo} | "
+        f"paquete={paquete}"
+    )
+
+    return jsonify({
+        "ok": True,
+        "mensaje": "Estado recibido."
+    })
+
+
+@app.route("/api/telefono/estado", methods=["GET"])
+def obtener_estado_telefono():
+
+    ahora = time.time()
+
+    with estado_telefono_lock:
+
+        estado = dict(
+            estado_telefono
+        )
+
+    ultima = estado.get(
+        "ultima_comunicacion"
+    )
+
+    if (
+        ultima is None
+        or
+        ahora - ultima > 10
+    ):
+        estado["conectado"] = False
+
+    return jsonify({
+        "ok": True,
+        "telefono": estado
+    })
+
 @app.route("/api/plan-hoy")
 def plan_hoy():
 
@@ -4326,6 +4482,1076 @@ def reanudar_actividad_detectada(actividad_id):
 
     return True
 
+
+# ==========================================
+# ENTRENADOR LOCAL DE EJERCICIO
+# ==========================================
+
+ENTRENADOR_PATH = os.path.join(
+    os.path.dirname(os.path.abspath(__file__)),
+    "detector_flexiones.py"
+)
+
+entrenador_proceso = None
+entrenador_lock = threading.Lock()
+
+
+def guardar_resultado_ejercicio(sesion_id, resultado):
+    conexion = conectar()
+    cursor = conexion.cursor()
+
+    cursor.execute("""
+        INSERT INTO ejercicios (
+            sesion_id,
+            fecha,
+            tipo,
+            repeticiones,
+            duracion_segundos,
+            creado_en
+        )
+        VALUES (?, ?, ?, ?, ?, ?)
+    """, (
+        sesion_id,
+        datetime.now().strftime("%Y-%m-%d"),
+        resultado.get("tipo", "flexiones"),
+        int(resultado.get("repeticiones", 0) or 0),
+        int(resultado.get("duracion_segundos", 0) or 0),
+        datetime.now().isoformat(timespec="seconds")
+    ))
+
+    conexion.commit()
+    conexion.close()
+
+
+def esperar_entrenador(proceso, sesion_id, archivo_resultado):
+    global entrenador_proceso
+
+    try:
+        proceso.wait()
+
+        if os.path.exists(archivo_resultado):
+            with open(
+                archivo_resultado,
+                "r",
+                encoding="utf-8"
+            ) as archivo:
+                resultado = json.load(archivo)
+
+            guardar_resultado_ejercicio(
+                sesion_id,
+                resultado
+            )
+
+            print(
+                "[EJERCICIO] Resultado guardado:",
+                resultado,
+                flush=True
+            )
+
+    except Exception as error:
+        print(
+            "[EJERCICIO] Error:",
+            error,
+            flush=True
+        )
+
+    finally:
+        try:
+            if os.path.exists(archivo_resultado):
+                os.remove(archivo_resultado)
+        except OSError:
+            pass
+
+        with entrenador_lock:
+            entrenador_proceso = None
+
+
+@app.route(
+    "/api/ejercicio/lanzar/<int:actividad_id>",
+    methods=["POST"]
+)
+def lanzar_entrenador(actividad_id):
+    global entrenador_proceso
+
+    if obtener_configuracion_valor(
+        "camara_habilitada",
+        "0"
+    ) != "1":
+        return jsonify({
+            "ok": True,
+            "lanzado": False,
+            "motivo": "camara_desactivada"
+        })
+
+    conexion = conectar()
+
+    actividad = conexion.execute("""
+        SELECT id, nombre, categoria
+        FROM actividades
+        WHERE id = ?
+    """, (
+        actividad_id,
+    )).fetchone()
+
+    if (
+        not actividad
+        or (actividad["categoria"] or "").lower()
+            != "ejercicio"
+    ):
+        conexion.close()
+
+        return jsonify({
+            "ok": True,
+            "lanzado": False,
+            "motivo": "no_es_ejercicio"
+        })
+
+    sesion = conexion.execute("""
+        SELECT id
+        FROM sesiones
+        WHERE actividad_id = ?
+        AND fecha = ?
+        AND estado != 'completado'
+        ORDER BY id DESC
+        LIMIT 1
+    """, (
+        actividad_id,
+        datetime.now().strftime("%Y-%m-%d")
+    )).fetchone()
+
+    conexion.close()
+
+    if not sesion:
+        return jsonify({
+            "ok": False,
+            "mensaje": "No existe una sesión de ejercicio activa."
+        }), 400
+
+    if not os.path.exists(ENTRENADOR_PATH):
+        return jsonify({
+            "ok": False,
+            "mensaje":
+                "No existe detector_flexiones.py en la carpeta del proyecto."
+        }), 404
+
+    with entrenador_lock:
+        if (
+            entrenador_proceso is not None
+            and entrenador_proceso.poll() is None
+        ):
+            return jsonify({
+                "ok": True,
+                "lanzado": False,
+                "motivo": "ya_abierto"
+            })
+
+        carpeta_resultados = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            "database"
+        )
+
+        os.makedirs(
+            carpeta_resultados,
+            exist_ok=True
+        )
+
+        archivo_resultado = os.path.join(
+            carpeta_resultados,
+            f"ejercicio_resultado_{sesion['id']}.json"
+        )
+
+        comando = [
+            sys.executable,
+            ENTRENADOR_PATH,
+            "--resultado",
+            archivo_resultado
+        ]
+
+        entrenador_proceso = subprocess.Popen(
+            comando,
+            cwd=os.path.dirname(
+                os.path.abspath(__file__)
+            )
+        )
+
+        hilo = threading.Thread(
+            target=esperar_entrenador,
+            args=(
+                entrenador_proceso,
+                sesion["id"],
+                archivo_resultado
+            ),
+            daemon=True
+        )
+
+        hilo.start()
+
+    return jsonify({
+        "ok": True,
+        "lanzado": True,
+        "sesion_id": sesion["id"]
+    })
+
+
+@app.route("/api/ejercicio/ultimo")
+def ultimo_ejercicio():
+    conexion = conectar()
+
+    fila = conexion.execute("""
+        SELECT
+            e.*,
+            a.nombre AS actividad_nombre
+        FROM ejercicios e
+        INNER JOIN sesiones s
+            ON s.id = e.sesion_id
+        INNER JOIN actividades a
+            ON a.id = s.actividad_id
+        ORDER BY e.id DESC
+        LIMIT 1
+    """).fetchone()
+
+    conexion.close()
+
+    return jsonify({
+        "ejercicio":
+            dict(fila)
+            if fila
+            else None
+    })
+
+
+# ==========================================
+# CONTROL DE CONCENTRACIÓN POR CÁMARA
+# ==========================================
+
+CONCENTRACION_PATH = os.path.join(
+    os.path.dirname(os.path.abspath(__file__)),
+    "detector_concentracion.py"
+)
+CONCENTRACION_ESTADO = os.path.join(
+    os.path.dirname(os.path.abspath(__file__)),
+    "database",
+    "concentracion_estado.json"
+)
+
+concentracion_proceso = None
+concentracion_sesion_id = None
+concentracion_pausada_automaticamente = None
+concentracion_sin_presencia_desde = None
+concentracion_presencia_desde = None
+concentracion_lock = threading.Lock()
+
+
+def _cerrar_detector_concentracion():
+    global concentracion_proceso
+    global concentracion_sesion_id
+    global concentracion_sin_presencia_desde
+    global concentracion_presencia_desde
+
+    with concentracion_lock:
+        proceso = concentracion_proceso
+        concentracion_proceso = None
+        concentracion_sesion_id = None
+        concentracion_sin_presencia_desde = None
+        concentracion_presencia_desde = None
+
+    if proceso is not None and proceso.poll() is None:
+        try:
+            proceso.terminate()
+            proceso.wait(timeout=3)
+        except Exception:
+            try:
+                proceso.kill()
+            except Exception:
+                pass
+
+    try:
+        if os.path.exists(CONCENTRACION_ESTADO):
+            os.remove(CONCENTRACION_ESTADO)
+    except OSError:
+        pass
+
+
+def _abrir_detector_concentracion(sesion_id):
+    global concentracion_proceso
+    global concentracion_sesion_id
+
+    if not os.path.exists(CONCENTRACION_PATH):
+        return False
+
+    os.makedirs(os.path.dirname(CONCENTRACION_ESTADO), exist_ok=True)
+
+    with concentracion_lock:
+        if concentracion_proceso is not None and concentracion_proceso.poll() is None:
+            if concentracion_sesion_id == sesion_id:
+                return True
+            return False
+
+        try:
+            if os.path.exists(CONCENTRACION_ESTADO):
+                os.remove(CONCENTRACION_ESTADO)
+        except OSError:
+            pass
+
+        concentracion_proceso = subprocess.Popen(
+            [
+                sys.executable,
+                CONCENTRACION_PATH,
+                "--estado",
+                CONCENTRACION_ESTADO
+            ],
+            cwd=os.path.dirname(os.path.abspath(__file__))
+        )
+        concentracion_sesion_id = sesion_id
+
+    print("[CONCENTRACIÓN] Cámara iniciada.", flush=True)
+    return True
+
+
+def _leer_estado_concentracion():
+    try:
+        if not os.path.exists(CONCENTRACION_ESTADO):
+            return None
+
+        # Ignorar un estado viejo si el detector dejó de actualizarlo.
+        if time.time() - os.path.getmtime(CONCENTRACION_ESTADO) > 3:
+            return None
+
+        with open(CONCENTRACION_ESTADO, "r", encoding="utf-8") as archivo:
+            return json.load(archivo)
+    except Exception:
+        return None
+
+
+def _pausar_sesion_concentracion(sesion_id):
+    ahora = datetime.now()
+    conexion = conectar()
+    sesion = conexion.execute("""
+        SELECT * FROM sesiones
+        WHERE id = ?
+        LIMIT 1
+    """, (sesion_id,)).fetchone()
+
+    if not sesion or sesion["estado_timer"] != "corriendo":
+        conexion.close()
+        return False
+
+    total = sesion["segundos_reales"] or 0
+    if sesion["ultimo_inicio"]:
+        inicio = datetime.fromisoformat(sesion["ultimo_inicio"])
+        total += max(0, int((ahora - inicio).total_seconds()))
+
+    conexion.execute("""
+        UPDATE sesiones
+        SET segundos_reales = ?,
+            estado_timer = 'pausado',
+            ultimo_inicio = NULL
+        WHERE id = ?
+    """, (total, sesion_id))
+    conexion.commit()
+    conexion.close()
+    return True
+
+
+def _reanudar_sesion_concentracion(sesion_id):
+    conexion = conectar()
+    sesion = conexion.execute("""
+        SELECT * FROM sesiones
+        WHERE id = ?
+        LIMIT 1
+    """, (sesion_id,)).fetchone()
+
+    if (
+        not sesion
+        or sesion["estado"] != "en_progreso"
+        or sesion["estado_timer"] != "pausado"
+    ):
+        conexion.close()
+        return False
+
+    conexion.execute("""
+        UPDATE sesiones
+        SET estado_timer = 'corriendo',
+            ultimo_inicio = ?
+        WHERE id = ?
+    """, (datetime.now().isoformat(), sesion_id))
+    conexion.commit()
+    conexion.close()
+    return True
+
+
+def monitor_concentracion():
+    global concentracion_pausada_automaticamente
+    global concentracion_sin_presencia_desde
+    global concentracion_presencia_desde
+
+    print("[CONCENTRACIÓN] Monitor iniciado.", flush=True)
+
+    while True:
+        try:
+            habilitada = obtener_configuracion_valor(
+                "concentracion_camara", "0"
+            ) == "1"
+
+            try:
+                tolerancia = int(obtener_configuracion_valor(
+                    "concentracion_tolerancia", "10"
+                ))
+            except ValueError:
+                tolerancia = 10
+            tolerancia = max(3, min(60, tolerancia))
+
+            conexion = conectar()
+            sesion = conexion.execute("""
+                SELECT
+                    s.id,
+                    s.estado,
+                    s.estado_timer,
+                    a.categoria
+                FROM sesiones s
+                INNER JOIN actividades a
+                    ON a.id = s.actividad_id
+                WHERE s.fecha = ?
+                  AND s.estado = 'en_progreso'
+                ORDER BY s.id DESC
+                LIMIT 1
+            """, (datetime.now().strftime("%Y-%m-%d"),)).fetchone()
+            conexion.close()
+
+            # No usar esta cámara durante ejercicio.
+            valida = (
+                habilitada
+                and sesion is not None
+                and (sesion["categoria"] or "").lower() != "ejercicio"
+            )
+
+            if not valida:
+                concentracion_pausada_automaticamente = None
+                _cerrar_detector_concentracion()
+                time.sleep(1)
+                continue
+
+            sid = sesion["id"]
+            corriendo = sesion["estado_timer"] == "corriendo"
+            pausa_auto = concentracion_pausada_automaticamente == sid
+
+            # Si fue pausada manualmente, apagar la cámara.
+            if not corriendo and not pausa_auto:
+                _cerrar_detector_concentracion()
+                time.sleep(1)
+                continue
+
+            if concentracion_sesion_id != sid:
+                _cerrar_detector_concentracion()
+                _abrir_detector_concentracion(sid)
+            elif concentracion_proceso is None or concentracion_proceso.poll() is not None:
+                # Si el usuario cerró la ventana con X/Q/ESC, no forzarla
+                # a reaparecer inmediatamente. Esperar a otro inicio manual.
+                time.sleep(1)
+                continue
+
+            estado = _leer_estado_concentracion()
+            if estado is None:
+                time.sleep(0.5)
+                continue
+
+            presente = bool(estado.get("presente", False))
+            ahora_mono = time.monotonic()
+
+            if corriendo:
+                concentracion_presencia_desde = None
+
+                if presente:
+                    concentracion_sin_presencia_desde = None
+                else:
+                    if concentracion_sin_presencia_desde is None:
+                        concentracion_sin_presencia_desde = ahora_mono
+                    elif ahora_mono - concentracion_sin_presencia_desde >= tolerancia:
+                        if _pausar_sesion_concentracion(sid):
+                            concentracion_pausada_automaticamente = sid
+                            concentracion_sin_presencia_desde = None
+                            print(
+                                f"[CONCENTRACIÓN] Pausa automática: {tolerancia}s sin presencia.",
+                                flush=True
+                            )
+
+            elif pausa_auto:
+                concentracion_sin_presencia_desde = None
+
+                if presente:
+                    if concentracion_presencia_desde is None:
+                        concentracion_presencia_desde = ahora_mono
+                    elif ahora_mono - concentracion_presencia_desde >= 2:
+                        if _reanudar_sesion_concentracion(sid):
+                            concentracion_pausada_automaticamente = None
+                            concentracion_presencia_desde = None
+                            print(
+                                "[CONCENTRACIÓN] Presencia recuperada. Temporizador reanudado.",
+                                flush=True
+                            )
+                else:
+                    concentracion_presencia_desde = None
+
+        except Exception as error:
+            print("[CONCENTRACIÓN] Error:", error, flush=True)
+
+        time.sleep(0.5)
+
+# =========================================================
+# CONCENTRACIÓN - TELÉFONO
+# =========================================================
+
+def telefono_es_distraccion(categoria, paquete, activo):
+
+    if not activo:
+        return False
+
+    categoria = (
+        categoria or ""
+    ).strip().lower()
+
+    paquete = (
+        paquete or ""
+    ).strip().lower()
+
+
+    # -----------------------------------------
+    # EJERCICIO
+    # -----------------------------------------
+
+    # El teléfono no controla actividades
+    # de ejercicio.
+
+    if categoria == "ejercicio":
+        return False
+
+
+    # -----------------------------------------
+    # INGLÉS
+    # -----------------------------------------
+
+    if categoria == "ingles":
+
+        return (
+            paquete
+            not in APPS_INGLES_PERMITIDAS
+        )
+
+
+    # -----------------------------------------
+    # BIBLIA / ESPIRITUAL
+    # -----------------------------------------
+
+    if categoria in (
+        "biblia",
+        "espiritual"
+    ):
+
+        return (
+            paquete
+            not in APPS_BIBLIA_PERMITIDAS
+        )
+
+
+    # -----------------------------------------
+    # RESTO DE ACTIVIDADES
+    # -----------------------------------------
+
+    return True
+
+
+def monitor_concentracion_telefono():
+
+    global telefono_distraccion_desde
+    global telefono_sin_distraccion_desde
+    global telefono_pausada_automaticamente
+
+    print(
+        "[TELÉFONO] Monitor de concentración iniciado.",
+        flush=True
+    )
+
+
+    while True:
+
+        try:
+
+            ahora_mono = time.monotonic()
+
+
+            # =========================================
+            # ESTADO ACTUAL DEL TELÉFONO
+            # =========================================
+
+            with estado_telefono_lock:
+
+                telefono = dict(
+                    estado_telefono
+                )
+
+
+            ultima_comunicacion = telefono.get(
+                "ultima_comunicacion"
+            )
+
+
+            conectado = (
+                ultima_comunicacion is not None
+                and
+                time.time()
+                - ultima_comunicacion
+                <= 10
+            )
+
+
+            activo = bool(
+                telefono.get("activo", False)
+            )
+
+
+            paquete = (
+                telefono.get("paquete")
+                or ""
+            )
+
+
+            # =========================================
+            # SESIÓN ACTUAL
+            # =========================================
+
+            conexion = conectar()
+
+            sesion = conexion.execute("""
+                SELECT
+                    s.id,
+                    s.estado,
+                    s.estado_timer,
+                    a.nombre,
+                    a.categoria
+
+                FROM sesiones s
+
+                INNER JOIN actividades a
+                    ON a.id = s.actividad_id
+
+                WHERE s.fecha = ?
+                AND s.estado = 'en_progreso'
+
+                ORDER BY s.id DESC
+
+                LIMIT 1
+            """, (
+                datetime.now().strftime(
+                    "%Y-%m-%d"
+                ),
+            )).fetchone()
+
+            conexion.close()
+
+
+            # =========================================
+            # SIN SESIÓN
+            # =========================================
+
+            if not sesion:
+
+                telefono_distraccion_desde = None
+                telefono_sin_distraccion_desde = None
+                telefono_pausada_automaticamente = None
+
+                time.sleep(1)
+
+                continue
+
+
+            sid = sesion["id"]
+
+            categoria = (
+                sesion["categoria"]
+                or ""
+            ).lower()
+
+
+            # =========================================
+            # EJERCICIO
+            # =========================================
+
+            if categoria == "ejercicio":
+
+                telefono_distraccion_desde = None
+                telefono_sin_distraccion_desde = None
+                telefono_pausada_automaticamente = None
+
+                time.sleep(1)
+
+                continue
+
+
+            corriendo = (
+                sesion["estado_timer"]
+                == "corriendo"
+            )
+
+
+            pausa_telefono = (
+                telefono_pausada_automaticamente
+                == sid
+            )
+
+
+            # =========================================
+            # PAUSA MANUAL
+            # =========================================
+
+            # Si está pausada pero NO fue el teléfono,
+            # nunca intentamos reanudarla.
+
+            if (
+                not corriendo
+                and
+                not pausa_telefono
+            ):
+
+                telefono_distraccion_desde = None
+                telefono_sin_distraccion_desde = None
+
+                time.sleep(1)
+
+                continue
+
+
+            # =========================================
+            # TELÉFONO DESCONECTADO
+            # =========================================
+
+            # Si Android deja de comunicarse,
+            # NO lo consideramos distracción.
+
+            if not conectado:
+
+                distraido = False
+
+            else:
+
+                distraido = telefono_es_distraccion(
+                    categoria,
+                    paquete,
+                    activo
+                )
+
+
+            # =========================================
+            # SESIÓN CORRIENDO
+            # =========================================
+
+            if corriendo:
+
+                telefono_sin_distraccion_desde = None
+
+
+                if distraido:
+
+                    if telefono_distraccion_desde is None:
+
+                        telefono_distraccion_desde = (
+                            ahora_mono
+                        )
+
+                        print(
+                            "[TELÉFONO] "
+                            f"Posible distracción: "
+                            f"{paquete}",
+                            flush=True
+                        )
+
+
+                    elif (
+                        ahora_mono
+                        -
+                        telefono_distraccion_desde
+                        >= TELEFONO_TOLERANCIA
+                    ):
+
+                        if _pausar_sesion_concentracion(
+                            sid
+                        ):
+
+                            telefono_pausada_automaticamente = (
+                                sid
+                            )
+
+                            telefono_distraccion_desde = None
+
+                            print(
+                                "[TELÉFONO] "
+                                "⏸ Pausa automática: "
+                                f"{TELEFONO_TOLERANCIA}s "
+                                f"usando {paquete}.",
+                                flush=True
+                            )
+
+
+                else:
+
+                    telefono_distraccion_desde = None
+
+
+            # =========================================
+            # PAUSADA POR EL TELÉFONO
+            # =========================================
+
+            elif pausa_telefono:
+
+                telefono_distraccion_desde = None
+
+
+                if not distraido:
+
+                    if (
+                        telefono_sin_distraccion_desde
+                        is None
+                    ):
+
+                        telefono_sin_distraccion_desde = (
+                            ahora_mono
+                        )
+
+
+                    elif (
+                        ahora_mono
+                        -
+                        telefono_sin_distraccion_desde
+                        >= TELEFONO_TIEMPO_REANUDAR
+                    ):
+
+                        if _reanudar_sesion_concentracion(
+                            sid
+                        ):
+
+                            telefono_pausada_automaticamente = (
+                                None
+                            )
+
+                            telefono_sin_distraccion_desde = (
+                                None
+                            )
+
+                            print(
+                                "[TELÉFONO] "
+                                "▶ Teléfono dejado. "
+                                "Temporizador reanudado.",
+                                flush=True
+                            )
+
+
+                else:
+
+                    telefono_sin_distraccion_desde = None
+
+
+        except Exception as error:
+
+            print(
+                "[TELÉFONO] Error en monitor:",
+                error,
+                flush=True
+            )
+
+
+        time.sleep(0.5)
+def detectar_distraccion_pc(titulo):
+
+    titulo = str(titulo or "").strip().lower()
+
+    if not titulo:
+        return None
+
+    for distraccion in DISTRACCIONES_PC:
+
+        if distraccion in titulo:
+            return distraccion
+
+    return None
+    
+def monitor_distracciones_pc():
+
+    global distraccion_pc_desde
+    global distraccion_pc_sesion
+
+    print(
+        "[DISTRACCIONES] Monitor de PC iniciado.",
+        flush=True
+    )
+
+    while True:
+
+        try:
+
+            # -----------------------------------------
+            # SESIÓN ACTUAL
+            # -----------------------------------------
+
+            conexion = conectar()
+
+            sesion = conexion.execute("""
+                SELECT
+                    s.id,
+                    s.estado,
+                    s.estado_timer,
+                    a.nombre,
+                    a.categoria
+                FROM sesiones s
+                INNER JOIN actividades a
+                    ON a.id = s.actividad_id
+                WHERE
+                    s.fecha = ?
+                    AND s.estado = 'en_progreso'
+                ORDER BY s.id DESC
+                LIMIT 1
+            """, (
+                datetime.now().strftime("%Y-%m-%d"),
+            )).fetchone()
+
+            conexion.close()
+
+            if not sesion:
+
+                distraccion_pc_desde = None
+                distraccion_pc_sesion = None
+
+                time.sleep(1)
+                continue
+
+
+            # -----------------------------------------
+            # EJERCICIO NO SE CONTROLA
+            # -----------------------------------------
+
+            categoria = (
+                sesion["categoria"] or ""
+            ).strip().lower()
+
+            if categoria == "ejercicio":
+
+                distraccion_pc_desde = None
+                distraccion_pc_sesion = None
+
+                time.sleep(1)
+                continue
+
+
+            # -----------------------------------------
+            # SOLO VIGILAR SI ESTÁ CORRIENDO
+            # -----------------------------------------
+
+            if sesion["estado_timer"] != "corriendo":
+
+                distraccion_pc_desde = None
+                distraccion_pc_sesion = None
+
+                time.sleep(1)
+                continue
+
+
+            # -----------------------------------------
+            # VENTANA ACTIVA
+            # -----------------------------------------
+
+            titulo = obtener_ventana_activa()
+
+            if isinstance(titulo, dict):
+                titulo = (
+                    titulo.get("titulo")
+                    or titulo.get("title")
+                    or ""
+                )
+
+            titulo = str(titulo or "")
+
+            enemigo = detectar_distraccion_pc(
+                titulo
+            )
+
+
+            # -----------------------------------------
+            # NO HAY DISTRACCIÓN
+            # -----------------------------------------
+
+            if not enemigo:
+
+                distraccion_pc_desde = None
+                distraccion_pc_sesion = None
+
+                time.sleep(1)
+                continue
+
+
+            # -----------------------------------------
+            # COMENZÓ UNA DISTRACCIÓN
+            # -----------------------------------------
+
+            sid = sesion["id"]
+            ahora = time.monotonic()
+
+            if distraccion_pc_sesion != sid:
+
+                distraccion_pc_sesion = sid
+                distraccion_pc_desde = ahora
+
+                print(
+                    f"[DISTRACCIONES] Detectado: {enemigo}",
+                    flush=True
+                )
+
+                time.sleep(1)
+                continue
+
+
+            if distraccion_pc_desde is None:
+
+                distraccion_pc_desde = ahora
+
+                time.sleep(1)
+                continue
+
+
+            # -----------------------------------------
+            # ESPERAR 10 SEGUNDOS
+            # -----------------------------------------
+
+            transcurrido = (
+                ahora - distraccion_pc_desde
+            )
+
+            if (
+                transcurrido
+                >= TIEMPO_DISTRACCION_PC
+            ):
+
+                if _pausar_sesion_concentracion(
+                    sid
+                ):
+
+                    print(
+                        "[DISTRACCIONES] "
+                        f"Pausa automática por {enemigo}.",
+                        flush=True
+                    )
+
+                distraccion_pc_desde = None
+                distraccion_pc_sesion = None
+
+
+        except Exception as error:
+
+            print(
+                "[DISTRACCIONES] Error:",
+                error,
+                flush=True
+            )
+
+        time.sleep(1)
+
 if __name__ == "__main__":
 
     crear_base_datos()
@@ -4345,9 +5571,28 @@ if __name__ == "__main__":
 
     hilo_detector.start()
 
+    hilo_concentracion = threading.Thread(
+        target=monitor_concentracion,
+        daemon=True
+    )
+    hilo_concentracion.start()
+
+    hilo_telefono = threading.Thread(
+        target=monitor_concentracion_telefono,
+        daemon=True
+    )
+
+    hilo_telefono.start()
+
+    hilo_distracciones = threading.Thread(
+        target=monitor_distracciones_pc,
+        daemon=True
+    )
+
+    hilo_distracciones.start()
     app.run(
-        host="127.0.0.1",
-        port=5000,
+        host="0.0.0.0",
+        port=5170,
         debug=True,
          use_reloader=False
     )

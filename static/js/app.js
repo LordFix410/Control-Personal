@@ -461,7 +461,9 @@ function mostrarActividadPrincipal(
             "⏸ PAUSADA";
 
         botonIniciar.textContent =
-            "▶ Continuar";
+            actividad.categoria === "ejercicio"
+                ? "📷 Iniciar con cámara"
+                : "▶ Continuar";
 
     } else {
 
@@ -469,7 +471,9 @@ function mostrarActividadPrincipal(
             "○ PENDIENTE";
 
         botonIniciar.textContent =
-            "▶ Iniciar";
+            actividad.categoria === "ejercicio"
+                ? "📷 Iniciar con cámara"
+                : "▶ Iniciar";
     }
 
 
@@ -662,7 +666,9 @@ async function cargarPlanHoy() {
             let simbolo = "○";
 
             let textoBoton =
-                "▶ Iniciar";
+                actividad.categoria === "ejercicio"
+                    ? "📷 Iniciar con cámara"
+                    : "▶ Iniciar";
 
             let accionPrincipal =
                 "iniciar";
@@ -683,7 +689,12 @@ async function cargarPlanHoy() {
             ) {
 
                 simbolo = "⏸";
-                textoBoton = "▶ Continuar";
+
+                textoBoton =
+                    actividad.categoria === "ejercicio"
+                        ? "📷 Iniciar con cámara"
+                        : "▶ Continuar";
+
                 accionPrincipal = "iniciar";
 
             } else if (
@@ -1023,6 +1034,41 @@ async function iniciarActividad(
 
 
     await actualizarTodo();
+
+    // Si la actividad es "ejercicio" y la cámara está habilitada,
+    // Flask abrirá el entrenador local. Para las demás actividades
+    // este endpoint simplemente responde sin hacer nada.
+    try {
+
+        const respuestaEjercicio =
+            await fetch(
+                `/api/ejercicio/lanzar/${actividadId}`,
+                {
+                    method: "POST"
+                }
+            );
+
+        const datosEjercicio =
+            await respuestaEjercicio.json();
+
+        if (
+            !respuestaEjercicio.ok
+            &&
+            datosEjercicio.mensaje
+        ) {
+            console.warn(
+                "Entrenador:",
+                datosEjercicio.mensaje
+            );
+        }
+
+    } catch (error) {
+
+        console.warn(
+            "No se pudo comprobar el entrenador:",
+            error
+        );
+    }
 
     return true;
 }

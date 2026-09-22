@@ -1,0 +1,19 @@
+{
+    "name": "Control Personal",
+    "short_name": "Control Personal",
+    "description": "Control Personal",
+    "id": "/",
+    "start_url": "/",
+    "scope": "/",
+    "display": "standalone",
+    "background_color": "#0f1115",
+    "theme_color": "#0f1115",
+    "icons": [
+        {
+            "src": "/static/icons/favicon512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any"
+        }
+    ]
+}

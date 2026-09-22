@@ -1,7 +1,5 @@
-<!DOCTYPE html>
-<html lang="es">
-
 <head>
+
     <meta charset="UTF-8">
 
     <meta
@@ -12,9 +10,31 @@
     <title>Control Personal</title>
 
     <link
+        rel="icon"
+        type="image/x-icon"
+        href="{{ url_for('static', filename='icons/favicon.ico') }}"
+    >
+
+    <link
+        rel="apple-touch-icon"
+        href="{{ url_for('static', filename='icons/favicon512.png') }}"
+    >
+
+    <link
+        rel="manifest"
+        href="{{ url_for('static', filename='manifest.json') }}"
+    >
+
+    <meta name="theme-color" content="#0f1115">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+    <link
         rel="stylesheet"
         href="{{ url_for('static', filename='css/style.css') }}"
     >
+
 </head>
 
 <body>
