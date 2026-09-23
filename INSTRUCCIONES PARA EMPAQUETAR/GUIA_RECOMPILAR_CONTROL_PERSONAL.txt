@@ -1,0 +1,154 @@
+Control Personal — Guía para recompilar los 3 EXE
+
+Proyecto: D:Personal
+
+Esta guía sirve para cuando haga mejoras al proyecto y necesite volver a
+empaquetar: - Control Personal.exe - detector_concentracion.exe -
+detector_flexiones.exe
+
+Al final, los tres quedan juntos dentro de: distPersonal
+
+1. Abrir CMD en el proyecto
+
+cd /d “D:Personal”
+
+Activar el entorno virtual:
+
+venv
+
+2. Probar primero en Python
+
+Antes de compilar:
+
+python app.py
+
+Comprobar que: - carga la página; - funcionan las actividades; -
+funciona concentración; - funciona flexiones.
+
+Cerrar el servidor con Ctrl + C.
+
+3. Compilar Control Personal.exe
+
+Eliminar solamente la compilación anterior del programa principal:
+
+rmdir /s /q “buildPersonal” rmdir /s /q “distPersonal”
+
+Compilar:
+
+pyinstaller –noconfirm –clean –onedir –name “Control Personal”
+–collect-all flask –hidden-import=win32gui –hidden-import=win32process
+–hidden-import=psutil –add-data “templates;templates” –add-data
+“static;static” app.py
+
+Resultado: distPersonalPersonal.exe
+
+IMPORTANTE: El programa compilado guarda la base de datos del usuario
+en:
+
+%LOCALAPPDATA%_personal.db
+
+No incluir la base de datos personal del proyecto en el instalador.
+
+4. Compilar detector_concentracion.exe
+
+Si existe un EXE onefile anterior:
+
+del /q “dist_concentracion.exe”
+
+Compilar:
+
+pyinstaller –noconfirm –clean –onefile –name detector_concentracion
+–collect-all mediapipe –collect-all cv2 –add-data
+“models_landmarker_lite.task;models” detector_concentracion.py
+
+Resultado: dist_concentracion.exe
+
+El modelo pose_landmarker_lite.task queda incluido dentro del EXE.
+
+5. Compilar detector_flexiones.exe
+
+Si existe un EXE onefile anterior:
+
+del /q “dist_flexiones.exe”
+
+Compilar:
+
+pyinstaller –noconfirm –clean –onefile –name detector_flexiones
+–collect-all mediapipe –collect-all cv2 –collect-all pyttsx3
+–hidden-import=pygrabber.dshow_graph –add-data
+“models_landmarker_lite.task;models” detector_flexiones.py
+
+Resultado: dist_flexiones.exe
+
+El detector intenta encontrar IVCam y, si no está disponible, utiliza
+otra cámara disponible.
+
+6. Juntar los tres EXE
+
+Copiar los dos detectores dentro de la carpeta del programa principal:
+
+copy /Y “dist_concentracion.exe” “distPersonal_concentracion.exe”
+
+copy /Y “dist_flexiones.exe” “distPersonal_flexiones.exe”
+
+La carpeta final debe contener como mínimo:
+
+distPersonal
+Control Personal.exe detector_concentracion.exe detector_flexiones.exe
+_internal
+
+NOTA: No significa convertir literalmente los tres programas en un único
+EXE. Los tres ejecutables trabajan juntos dentro de una sola carpeta, y
+esa carpeta completa es la que posteriormente se empaqueta en un solo
+instalador con Inno Setup.
+
+7. Prueba final antes del instalador
+
+Ejecutar:
+
+“distPersonalPersonal.exe”
+
+Comprobar: - actividad normal; - detector de concentración; - entrenador
+de flexiones; - guardado de datos.
+
+Comprobar la base instalada:
+
+dir “%LOCALAPPDATA%” /s
+
+Debe existir:
+
+%LOCALAPPDATA%_personal.db
+
+8. Si PyInstaller vuelve a decir que falta cv2 o mediapipe
+
+Comprobar:
+
+pip list | findstr /I “opencv” pip list | findstr /I “mediapipe”
+
+Prueba conjunta:
+
+python -c “import cv2, mediapipe, numpy; print(‘OpenCV:’,
+cv2.__version__); print(‘MediaPipe:’, mediapipe.__version__);
+print(‘NumPy:’, numpy.__version__); print(‘TODO OK’)”
+
+En la configuración que funcionó al crear esta guía: -
+opencv-contrib-python estaba correctamente instalado; - mediapipe estaba
+correctamente instalado; - ambos podían importarse desde el venv.
+
+9. Resumen rápido
+
+Cada vez que haga cambios:
+
+1.  Activar venv.
+2.  Probar con python app.py.
+3.  Recompilar Control Personal.exe.
+4.  Recompilar detector_concentracion.exe si fue modificado o cambiaron
+    dependencias.
+5.  Recompilar detector_flexiones.exe si fue modificado o cambiaron
+    dependencias.
+6.  Copiar ambos detectores dentro de distPersonal.
+7.  Probar los tres desde Control Personal.exe.
+8.  Crear/actualizar el instalador con Inno Setup usando la carpeta
+    distPersonal completa.
+
+GG 😎
