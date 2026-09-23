@@ -11,6 +11,7 @@ import json
 import subprocess
 import threading
 import time
+import webbrowser
 from datetime import datetime, timedelta
 from detector_actividad import obtener_ventana_activa
 
@@ -19,18 +20,15 @@ app = Flask(__name__)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # ==========================================
-# CARPETA DE DATOS
+# CARPETA DE DATOS DEL USUARIO
 # ==========================================
 
 if getattr(sys, "frozen", False):
-    # Aplicación compilada:
-    # C:\Users\USUARIO\AppData\Local\ControlPersonal
     DATA_DIR = os.path.join(
         os.environ.get("LOCALAPPDATA", os.path.expanduser("~")),
         "ControlPersonal"
     )
 else:
-    # Desarrollo: seguimos usando la carpeta del proyecto
     DATA_DIR = BASE_DIR
 
 os.makedirs(DATA_DIR, exist_ok=True)
@@ -40,6 +38,7 @@ DB_PATH = os.path.join(
     "database",
     "control_personal.db"
 )
+
 notificaciones_pendientes = []
 detecciones_pendientes = []
 actividad_detectada_actual = None
@@ -164,6 +163,8 @@ def actualizar_base_datos():
 
     conexion.commit()
     conexion.close()
+
+
 
 def crear_base_datos():
 
@@ -4519,7 +4520,6 @@ else:
         BASE_DIR,
         "detector_flexiones.py"
     )
-
 entrenador_proceso = None
 entrenador_lock = threading.Lock()
 
@@ -5611,14 +5611,12 @@ if __name__ == "__main__":
         target=monitor_horario,
         daemon=True
     )
-
     hilo_monitor.start()
 
     hilo_detector = threading.Thread(
         target=monitor_actividad_pc,
         daemon=True
     )
-
     hilo_detector.start()
 
     hilo_concentracion = threading.Thread(
@@ -5631,18 +5629,27 @@ if __name__ == "__main__":
         target=monitor_concentracion_telefono,
         daemon=True
     )
-
     hilo_telefono.start()
 
     hilo_distracciones = threading.Thread(
         target=monitor_distracciones_pc,
         daemon=True
     )
-
     hilo_distracciones.start()
+
+    # Abrir automáticamente Control Personal en el navegador
+    def abrir_navegador():
+        time.sleep(1.5)
+        webbrowser.open("http://127.0.0.1:5170/")
+
+    threading.Thread(
+        target=abrir_navegador,
+        daemon=True
+    ).start()
+
     app.run(
         host="0.0.0.0",
         port=5170,
-        debug=True,
-         use_reloader=False
+        debug=False,
+        use_reloader=False
     )
