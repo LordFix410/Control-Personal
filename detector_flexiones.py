@@ -26,7 +26,13 @@ ARGS = parser.parse_args()
 # CONFIGURACION
 # ============================================================
 
-MODELO = r"D:\GITHUB\Control Personal\models\pose_landmarker_lite.task"
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+MODELO = os.path.join(
+    BASE_DIR,
+    "models",
+    "pose_landmarker_lite.task"
+)
 ANCHO = 1280
 ALTO = 720
 FPS = 30
