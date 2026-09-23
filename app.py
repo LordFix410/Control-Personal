@@ -17,7 +17,29 @@ from detector_actividad import obtener_ventana_activa
 app = Flask(__name__)
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DB_PATH = os.path.join(BASE_DIR, "database", "control_personal.db")
+
+# ==========================================
+# CARPETA DE DATOS
+# ==========================================
+
+if getattr(sys, "frozen", False):
+    # Aplicación compilada:
+    # C:\Users\USUARIO\AppData\Local\ControlPersonal
+    DATA_DIR = os.path.join(
+        os.environ.get("LOCALAPPDATA", os.path.expanduser("~")),
+        "ControlPersonal"
+    )
+else:
+    # Desarrollo: seguimos usando la carpeta del proyecto
+    DATA_DIR = BASE_DIR
+
+os.makedirs(DATA_DIR, exist_ok=True)
+
+DB_PATH = os.path.join(
+    DATA_DIR,
+    "database",
+    "control_personal.db"
+)
 notificaciones_pendientes = []
 detecciones_pendientes = []
 actividad_detectada_actual = None
@@ -4487,10 +4509,16 @@ def reanudar_actividad_detectada(actividad_id):
 # ENTRENADOR LOCAL DE EJERCICIO
 # ==========================================
 
-ENTRENADOR_PATH = os.path.join(
-    os.path.dirname(os.path.abspath(__file__)),
-    "detector_flexiones.py"
-)
+if getattr(sys, "frozen", False):
+    ENTRENADOR_PATH = os.path.join(
+        os.path.dirname(sys.executable),
+        "detector_flexiones.exe"
+    )
+else:
+    ENTRENADOR_PATH = os.path.join(
+        BASE_DIR,
+        "detector_flexiones.py"
+    )
 
 entrenador_proceso = None
 entrenador_lock = threading.Lock()
@@ -4646,7 +4674,7 @@ def lanzar_entrenador(actividad_id):
             })
 
         carpeta_resultados = os.path.join(
-            os.path.dirname(os.path.abspath(__file__)),
+            DATA_DIR,
             "database"
         )
 
@@ -4660,12 +4688,19 @@ def lanzar_entrenador(actividad_id):
             f"ejercicio_resultado_{sesion['id']}.json"
         )
 
-        comando = [
-            sys.executable,
-            ENTRENADOR_PATH,
-            "--resultado",
-            archivo_resultado
-        ]
+        if getattr(sys, "frozen", False):
+            comando = [
+                ENTRENADOR_PATH,
+                "--resultado",
+                archivo_resultado
+            ]
+        else:
+            comando = [
+                sys.executable,
+                ENTRENADOR_PATH,
+                "--resultado",
+                archivo_resultado
+            ]
 
         entrenador_proceso = subprocess.Popen(
             comando,
@@ -4724,13 +4759,19 @@ def ultimo_ejercicio():
 # CONTROL DE CONCENTRACIÓN POR CÁMARA
 # ==========================================
 
-CONCENTRACION_PATH = os.path.join(
-    os.path.dirname(os.path.abspath(__file__)),
-    "detector_concentracion.py"
-)
+if getattr(sys, "frozen", False):
+    CONCENTRACION_PATH = os.path.join(
+        os.path.dirname(sys.executable),
+        "detector_concentracion.exe"
+    )
+else:
+    CONCENTRACION_PATH = os.path.join(
+        BASE_DIR,
+        "detector_concentracion.py"
+    )
+
 CONCENTRACION_ESTADO = os.path.join(
-    os.path.dirname(os.path.abspath(__file__)),
-    "database",
+    DATA_DIR,
     "concentracion_estado.json"
 )
 
@@ -4793,14 +4834,23 @@ def _abrir_detector_concentracion(sesion_id):
         except OSError:
             pass
 
-        concentracion_proceso = subprocess.Popen(
-            [
+        if getattr(sys, "frozen", False):
+            comando = [
+                CONCENTRACION_PATH,
+                "--estado",
+                CONCENTRACION_ESTADO
+            ]
+        else:
+            comando = [
                 sys.executable,
                 CONCENTRACION_PATH,
                 "--estado",
                 CONCENTRACION_ESTADO
-            ],
-            cwd=os.path.dirname(os.path.abspath(__file__))
+            ]
+
+        concentracion_proceso = subprocess.Popen(
+            comando,
+            cwd=BASE_DIR
         )
         concentracion_sesion_id = sesion_id
 
