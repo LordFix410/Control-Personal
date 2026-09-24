@@ -1,10 +1,10 @@
-# 🧠 Control Personal
+# Control Personal
 
 **Control Personal** es una aplicación de escritorio orientada a la organización personal, seguimiento de actividades, productividad y hábitos.
 
 El sistema fue desarrollado principalmente con **Python, Flask y SQLite**, utilizando una interfaz web local y herramientas de monitoreo para Windows. También incorpora visión por computadora para funciones de concentración y seguimiento de ejercicios.
 
-## ✨ Características principales
+## Características principales
 
 - Seguimiento de actividades mediante temporizadores.
 - Organización de actividades por horarios.
@@ -82,7 +82,29 @@ Control Personal
 
 ## Capturas de pantalla
 
-> Próximamente se agregarán capturas de la interfaz principal, configuración, metas, progreso y detectores.
+### Panel principal
+
+![Panel principal de Control Personal](docs/screenshots/panel-principal.png)
+
+### Metas y hábitos
+
+![Gestión de metas y hábitos](docs/screenshots/metas-habitos.png)
+
+### Seguimiento del progreso
+
+![Progreso y estadísticas](docs/screenshots/progreso.png)
+
+### Ajustes
+
+![Detección mediante OpenCV y MediaPipe](docs/screenshots/ajustes.png)
+
+### Vision por telefono
+
+![Detección mediante OpenCV y MediaPipe](docs/screenshots/vision-telefono.png)
+
+### Panel de control ejercicio
+
+![Detección mediante OpenCV y MediaPipe](docs/screenshots/vision-computadora.png)
 
 ## Instalación
 
@@ -118,7 +140,7 @@ La base de datos principal se encuentra en:
 
 Esto permite actualizar o reinstalar la aplicación sin depender de los archivos ubicados en `Program Files`.
 
-## 💻 Ejecución desde el código fuente
+## Ejecución desde el código fuente
 
 Clona el repositorio:
 
