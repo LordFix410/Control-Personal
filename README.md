@@ -106,6 +106,7 @@ Control Personal
 
 ![Detección mediante OpenCV y MediaPipe](docs/screenshots/vision-computadora.png)
 
+
 ## Instalación
 
 La forma recomendada de utilizar Control Personal es mediante el instalador disponible en **Releases**.
@@ -206,6 +207,13 @@ Control Personal está diseñado para trabajar principalmente de forma local.
 
 Los registros de actividades y progreso se almacenan en una base de datos SQLite en el equipo del usuario.
 
+## Descargas
+
+- **Windows:** `Control-Personal-Setup-v1.0.0.exe`
+- **Android:** `Control-Personal-Android-v1.0.0.apk`
+
+> La aplicación Android funciona como complemento de Control Personal y permite acceder a la interfaz desde el teléfono sin la barra del navegador.
+
 ## Mejoras futuras
 
 - Selector de cámara desde la interfaz.
@@ -228,7 +236,3 @@ Primera versión distribuible del proyecto para Windows.
 Ingeniería en Sistemas | Desarrollo de Software | Infraestructura TI | Automatización
 
 GitHub: **LordFix410**
-
----
-
-Proyecto desarrollado como parte de mi portafolio personal de software.
