@@ -209,11 +209,14 @@ Los registros de actividades y progreso se almacenan en una base de datos SQLite
 
 ## Descargas
 
-- **Windows:** `Control-Personal-Setup-v1.0.0.exe`
-- **Android:** `Control-Personal-Android-v1.0.0.apk`
+### 🖥️ Windows
+[⬇️ Descargar Control Personal v1.0.0 para Windows](https://github.com/LordFix410/Control-Personal/releases/download/v1.0.0/Control-Personal-Setup-v1.0.0.exe)
 
-> La aplicación Android funciona como complemento de Control Personal y permite acceder a la interfaz desde el teléfono sin la barra del navegador.
+### 📱 Android
+[⬇️ Descargar Control Personal v1.0.0 para Android](https://github.com/LordFix410/Control-Personal/releases/download/v1.0.0/Control-Personal-Android-v1.0.0.apk)
 
+> La aplicación Android permite acceder a Control Personal desde el teléfono sin la barra del navegador y requiere conexión con el servidor de Control Personal.
+> 
 ## Mejoras futuras
 
 - Selector de cámara desde la interfaz.
